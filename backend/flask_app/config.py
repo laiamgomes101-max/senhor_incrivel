@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv, find_dotenv
+from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 
 # Carrega variáveis de ambiente a partir de arquivos .env
 load_dotenv()
@@ -10,6 +11,27 @@ if local_env:
 custom_env = find_dotenv('.env.mysql')
 if custom_env:
     load_dotenv(custom_env, override=False)
+
+
+def normalize_mysql_url(database_url: str) -> str:
+    parsed = urlparse(database_url)
+    query_params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+
+    # PyMySQL does not accept ssl_mode as a connect arg; remove it.
+    query_params.pop('ssl-mode', None)
+    query_params.pop('ssl_mode', None)
+
+    # Convert Aiven-style SSL query params to PyMySQL-compatible names.
+    if 'ssl-ca' in query_params and 'ssl_ca' not in query_params:
+        query_params['ssl_ca'] = query_params.pop('ssl-ca')
+    if 'ssl-cert' in query_params and 'ssl_cert' not in query_params:
+        query_params['ssl_cert'] = query_params.pop('ssl-cert')
+    if 'ssl-key' in query_params and 'ssl_key' not in query_params:
+        query_params['ssl_key'] = query_params.pop('ssl-key')
+
+    new_query = urlencode(query_params)
+    return urlunparse(parsed._replace(query=new_query))
+
 
 class Config:
     # Chaves secretas usadas pelo Flask e pelo JWT
@@ -39,10 +61,8 @@ class Config:
         lower_url = database_url.lower()
         if lower_url.startswith('mysql://') and 'pymysql' not in lower_url:
             database_url = 'mysql+pymysql://' + database_url[len('mysql://'):]
-        database_url = database_url.replace('ssl-mode=', 'ssl_mode=')
-        database_url = database_url.replace('ssl-ca=', 'ssl_ca=')
-        database_url = database_url.replace('ssl-cert=', 'ssl_cert=')
-        database_url = database_url.replace('ssl-key=', 'ssl_key=')
+        if lower_url.startswith('mysql+pymysql://'):
+            database_url = normalize_mysql_url(database_url)
         SQLALCHEMY_DATABASE_URI = database_url
     elif flask_env == 'development' and db_type == 'sqlite':
 
