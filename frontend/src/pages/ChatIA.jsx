@@ -263,8 +263,8 @@ export default function ChatIA() {
     } catch (err) {
 
       console.error(err)
-
-      addMessage({ sender: 'bot', text: 'Erro ao processar a solicitação. Tente novamente.' })
+      const botText = err?.payload?.msg || err?.payload?.message || err?.message || 'Erro ao processar a solicitação. Tente novamente.'
+      addMessage({ sender: 'bot', text: botText })
 
     } finally {
 

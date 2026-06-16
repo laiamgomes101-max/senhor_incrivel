@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: plataforma-curriculos-backend
+    env: python
+    root: backend/flask_app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /health

@@ -6,11 +6,11 @@ export default function AutoCard({ items = [], interval = 6000 }) {
   const mounted = useRef(true)
 
   useEffect(() => {
-    // Marca que o componente ainda está montado para evitar atualizações após desmontar
+   
     mounted.current = true
     const id = setInterval(() => {
       if (!mounted.current) return
-      // Avança para o próximo item do card, voltando ao início no final
+    
       setIndex(i => (i + 1) % items.length)
     }, interval)
 

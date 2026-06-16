@@ -33,7 +33,10 @@ class Config:
     db_type = os.getenv('DB_TYPE', 'mysql')
     flask_env = os.getenv('FLASK_ENV', 'development')
 
-    if flask_env == 'development' and db_type == 'sqlite':
+    database_url = os.getenv('DATABASE_URL') or os.getenv('SQLALCHEMY_DATABASE_URI')
+    if database_url:
+        SQLALCHEMY_DATABASE_URI = database_url
+    elif flask_env == 'development' and db_type == 'sqlite':
 
         instance_path = os.path.join(os.path.dirname(__file__), 'instance')
         os.makedirs(instance_path, exist_ok=True)

@@ -26,7 +26,7 @@ flaskClient.interceptors.response.use(
   (res) => res,
   (err) => {
     const data = err.response?.data
-    const message = data?.error || data?.message || err.message || 'Erro de comunicação com o servidor'
+    const message = data?.error || data?.message || data?.msg || err.message || 'Erro de comunicação com o servidor'
     const e = new Error(message)
     e.status = err.response?.status
     e.payload = data

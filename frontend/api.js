@@ -3,7 +3,9 @@ console.log('api.js iniciando...');
 
 
 const NODE_API_BASE = import.meta.env?.VITE_API_URL || 'http://localhost:3001';
-const FLASK_API_BASE = import.meta.env?.VITE_FLASK_URL || 'http://localhost:5000';
+const FLASK_API_BASE = import.meta.env.MODE === 'production'
+  ? 'https://backend-plataforma-3h2p.onrender.com'
+  : '';
 
 
 const API_BASE = `${FLASK_API_BASE}/api`;
