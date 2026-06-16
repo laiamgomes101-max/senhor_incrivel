@@ -1,0 +1,309 @@
+/* CandidatoDashboard.css */
+.candidato-dashboard {
+  background: #f5f5f5;
+  min-height: 100vh;
+  padding: 0;
+}
+
+.dashboard-container {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header */
+.dashboard-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+}
+
+.user-info h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.user-headline {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Navigation */
+.dashboard-nav {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 80px;
+  z-index: 99;
+  overflow-x: auto;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  background: #f5f5f5;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-button:hover {
+  background: #e8e8e8;
+  color: #333;
+}
+
+.nav-button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.nav-icon {
+  font-size: 18px;
+}
+
+.badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff6b6b;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Content */
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  min-height: calc(100vh - 200px);
+}
+
+.content-section {
+  width: 100%;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Perfil Section */
+.perfil-section {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.perfil-card {
+  background: white;
+  border-radius: 8px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.perfil-card h2 {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.perfil-info {
+  margin-bottom: 24px;
+}
+
+.info-group {
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-group:last-of-type {
+  border-bottom: none;
+}
+
+.info-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.info-group p {
+  margin: 0;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+}
+
+.edit-perfil-btn {
+  width: 100%;
+  padding: 12px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.edit-perfil-btn:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Login Required */
+.login-required {
+  background: white;
+  border-radius: 8px;
+  padding: 60px 20px;
+  text-align: center;
+  color: #666;
+  margin: 40px 20px;
+}
+
+.login-required h2 {
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.login-required p {
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-header {
+    padding: 12px;
+  }
+
+  .header-content {
+    padding: 0;
+  }
+
+  .user-info {
+    gap: 12px;
+  }
+
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+  }
+
+  .user-info h1 {
+    font-size: 20px;
+  }
+
+  .dashboard-nav {
+    padding: 12px 12px;
+    gap: 8px;
+  }
+
+  .nav-button {
+    padding: 8px 12px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .nav-icon {
+    font-size: 16px;
+  }
+
+  .dashboard-content {
+    padding: 12px;
+  }
+
+  .perfil-card {
+    padding: 20px;
+  }
+
+  .perfil-card h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-headline {
+    display: none;
+  }
+
+  .dashboard-nav {
+    gap: 6px;
+  }
+
+  .nav-button {
+    padding: 8px 10px;
+  }
+
+  .nav-icon {
+    font-size: 14px;
+  }
+
+  .nav-button span:not(.nav-icon) {
+    display: none;
+  }
+
+  .badge {
+    top: -12px;
+    right: -12px;
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}

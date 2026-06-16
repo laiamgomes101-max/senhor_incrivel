@@ -1,0 +1,632 @@
+.interview-scheduler {
+  background: var(--bg-primary);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  border: 1px solid var(--border);
+}
+
+.scheduler-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.scheduler-header h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.scheduler-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.scheduler-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.tab-btn.active {
+  background: var(--bg-primary);
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+}
+
+/* Calendar View */
+.calendar-view {
+  min-height: 500px;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.nav-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: var(--accent-hover);
+}
+
+.calendar-grid {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  padding: 0.5rem;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+.day-cell {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.day-cell.valid {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+}
+
+.day-cell.valid:hover {
+  background: var(--accent);
+  color: white;
+  transform: scale(1.05);
+}
+
+.day-cell.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.day-cell.has-interviews {
+  border-color: var(--success);
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.interview-indicator {
+  position: absolute;
+  bottom: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--success);
+  border-radius: 50%;
+}
+
+.selected-date-info {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.selected-date-info h4 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.loading-slots {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(99, 102, 241, 0.1);
+  border-top: 2px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.time-slots h5 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.5rem;
+}
+
+.slot-btn {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.slot-btn:hover:not(.unavailable) {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.slot-btn.selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.slot-btn.unavailable {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* List View */
+.list-view {
+  min-height: 400px;
+}
+
+.interviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.no-interviews {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+}
+
+.no-interviews-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.no-interviews h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.interview-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.interview-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.interview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.interview-datetime h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.time {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  background: var(--accent);
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.duration {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.interview-type {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--bg-primary);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.interview-details {
+  margin-bottom: 1rem;
+}
+
+.participants {
+  margin-bottom: 1rem;
+}
+
+.participants strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.participant-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.participant {
+  padding: 0.3rem 0.6rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent);
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.notes strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.notes p {
+  margin: 0.5rem 0 0 0;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.interview-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.reschedule-btn,
+.cancel-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reschedule-btn {
+  background: var(--warning);
+  color: white;
+}
+
+.reschedule-btn:hover {
+  background: #d97706;
+}
+
+.cancel-btn {
+  background: var(--error);
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #dc2626;
+}
+
+/* New Interview View */
+.new-interview-view {
+  min-height: 500px;
+}
+
+.interview-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+}
+
+.form-section h3 {
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.participants-input {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.participants-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.participant-tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.participant-tag button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.participant-tag button:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.schedule-btn {
+  padding: 0.8rem 1.5rem;
+  background: var(--success);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.schedule-btn:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.schedule-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cancel-btn {
+  padding: 0.8rem 1.5rem;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+  background: var(--error);
+  color: white;
+  border-color: var(--error);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .interview-scheduler {
+    padding: 1rem;
+  }
+  
+  .scheduler-tabs {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .tab-btn {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .calendar-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .calendar-grid {
+    padding: 0.5rem;
+  }
+  
+  .weekdays,
+  .days {
+    gap: 0.25rem;
+  }
+  
+  .day-cell {
+    font-size: 0.8rem;
+  }
+  
+  .slots-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  
+  .interview-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .interview-actions {
+    flex-direction: column;
+  }
+  
+  .reschedule-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .schedule-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+}

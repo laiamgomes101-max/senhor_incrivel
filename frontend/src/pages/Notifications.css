@@ -1,0 +1,75 @@
+.notifications-page {
+  width: 100%;
+  min-height: calc(100vh - 7rem);
+  padding-bottom: 2rem;
+  overflow-y: auto;
+}
+
+.notifications-page .page-header {
+  margin-bottom: 1.5rem;
+}
+
+.notifications-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.notifications-tabs button {
+  padding: 0.75rem 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.notifications-tabs button.active,
+.notifications-tabs button:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.notifications-list {
+  display: grid;
+  gap: 1rem;
+  max-height: calc(100vh - 16rem);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.notification-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+}
+
+.notification-card strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.notification-card p {
+  margin: 0;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+}
+
+@media (max-width: 768px) {
+  .notifications-list {
+    max-height: none;
+  }
+}

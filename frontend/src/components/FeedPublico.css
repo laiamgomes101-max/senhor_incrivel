@@ -1,0 +1,230 @@
+/* FeedPublico.css */
+.feed-publico-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+.feed-main {
+  width: 100%;
+}
+
+/* Seção de Criar Post */
+.create-post-section {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.create-post-section h2 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.create-post-form {
+  width: 100%;
+}
+
+.post-input-group {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.post-input-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.post-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 14px;
+  resize: vertical;
+  font-size: 14px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.post-textarea:focus {
+  outline: none;
+  background: white;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.post-textarea:disabled {
+  opacity: 0.6;
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-count {
+  font-size: 12px;
+  color: #999;
+}
+
+.publish-btn {
+  padding: 10px 24px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.publish-btn:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.3);
+}
+
+.publish-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Posts Feed */
+.posts-feed {
+  width: 100%;
+}
+
+.login-prompt {
+  background: white;
+  border: 2px solid #2196F3;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  color: #2196F3;
+  font-weight: 500;
+}
+
+.empty-state {
+  background: white;
+  border-radius: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: #999;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+}
+
+.empty-state small {
+  display: block;
+  font-size: 12px;
+}
+
+.loading {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.error-message {
+  background: #ffebee;
+  border-radius: 8px;
+  padding: 16px;
+  color: #c62828;
+  margin-bottom: 16px;
+  border-left: 4px solid #c62828;
+}
+
+/* Paginação */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.pagination-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: #333;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  border-color: #4CAF50;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-info {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .feed-publico-container {
+    padding: 12px;
+  }
+
+  .create-post-section,
+  .post-card {
+    margin-bottom: 12px;
+  }
+
+  .post-textarea {
+    min-height: 60px;
+  }
+
+  .pagination {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    width: 100%;
+  }
+}

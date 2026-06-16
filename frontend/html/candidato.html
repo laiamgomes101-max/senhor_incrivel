@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Candidato - CurriculoHub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    :root{
+      --primary: #667eea;
+      --primary-2: #764ba2;
+      --bg-dark: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      --card-bg: rgba(255,255,255,0.95);
+      --card-radius: 16px;
+    }
+    body{ font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); }
+    .profile-header-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 200px;
+      margin: -2rem -2rem 0 -2rem;
+    }
+
+    .profile-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .profile-main {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .profile-sidebar {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+    }
+
+    .profile-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(8px);
+      border-radius: var(--card-radius);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      position: relative;
+      border:1px solid rgba(255,255,255,0.06);
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+    }
+
+    .profile-avatar {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      border: 4px solid rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: -60px auto 1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .profile-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-subtitle {
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .profile-bio {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .profile-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .profile-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-message {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-message:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-save {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .btn-save:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .sidebar-link {
+      padding: 0.5rem 0;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .sidebar-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Content */
+    .profile-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .content-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .content-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .experience-item,
+    .education-item,
+    .skill-item {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .experience-item:last-child,
+    .education-item:last-child,
+    .skill-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .item-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 1.1rem;
+    }
+
+    .item-company {
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .item-period {
+      color: var(--text-light);
+      font-size: 0.85rem;
+    }
+
+    .item-description {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .skill-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.75rem;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+      border: 1px solid var(--primary);
+    }
+
+    .skill-badge:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .curriculos-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .curriculo-item {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-light);
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .curriculo-item:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .curriculo-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .curriculo-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .curriculo-date {
+      font-size: 0.75rem;
+      color: var(--text-light);
+    }
+
+    .edit-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .edit-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .edit-btn.show {
+      display: flex;
+    }
+
+    @media (max-width: 768px) {
+      .profile-main {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-sidebar {
+        position: static;
+      }
+
+      .skills-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      }
+
+      .curriculos-list {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="feed-candidato.html" class="navbar-brand">Currículos</a>
+      <ul class="navbar-nav">
+        <li><a href="feed-candidato.html" class="nav-link">Feed</a></li>
+        <li><a href="#" class="nav-link">Mensagens</a></li>
+        <li><a href="#" class="nav-link">Notificações</a></li>
+      </ul>
+      <div class="user-menu">
+        <div class="user-avatar" id="userAvatar"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Profile Header -->
+  <div class="profile-header-bg"></div>
+
+  <!-- Profile Container -->
+  <div class="profile-container">
+    <div class="profile-main">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="profile-card">
+          <div id="profileAvatar" class="profile-avatar"></div>
+          <h2 id="profileName" class="profile-name">Carregando...</h2>
+          <p id="profileProfissao" class="profile-subtitle">Profissão</p>
+          <p id="profileHeadline" style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:1rem;">&nbsp;</p>
+          <p id="profileBio" class="profile-bio">Bio do candidato</p>
+
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-number" id="statCandidaturas">0</div>
+              <div class="stat-label">Candidaturas</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number" id="statVisualizacoes">0</div>
+              <div class="stat-label">Visualizações</div>
+            </div>
+          </div>
+
+          <div class="profile-actions" id="profileActions">
+            <button class="btn-small btn-message">Mensagem</button>
+            <button class="btn-small btn-save">Salvar</button>
+          </div>
+          <!-- link para configurações -->
+          <a href="config.html" class="sidebar-link" style="margin-top:0.5rem; display:block; text-align:center;">Configurações</a>
+        </div>
+
+        <div class="profile-card" style="text-align: left;">
+          <h4 style="margin-bottom: 1rem;">Informações</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Headline:</strong> <span id="profileHeadlineInfo">&nbsp;</span>
+          </p>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Local:</strong> <span id="profileLocation">São Paulo, SP</span>
+          </p>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Email:</strong> <span id="profileEmail">email@example.com</span>
+          </p>
+          <p style="font-size: 0.9rem;">
+            <strong>Membro desde:</strong> <span id="profileMemberSince">Fevereiro 2026</span>
+          </p>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Competências:</strong> <span id="profileHabilidades">—</span>
+          </p>
+          <p style="font-size: 0.9rem;">
+            <strong>Idiomas:</strong> <span id="profileIdiomas">—</span>
+          </p>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="profile-content">
+        <!-- Sobre -->
+        <section class="content-section">
+          <h3 class="section-title">Sobre</h3>
+          <p id="aboutText">
+            Profissional dedicado e apaixonado por tecnologia. Com experiência em desenvolvimento web e design de sistemas.
+          </p>
+        </section>
+
+        <!-- Experiência -->
+        <section class="content-section">
+          <h3 class="section-title">Experiência</h3>
+          <div id="experienceContainer">
+            <p style="color: var(--text-light); text-align: center;">Sem experiências adicionadas ainda</p>
+          </div>
+        </section>
+
+        <!-- Formação -->
+        <section class="content-section">
+          <h3 class="section-title">Formação</h3>
+          <div id="educationContainer">
+            <p style="color: var(--text-light); text-align: center;">Sem formação adicionada ainda</p>
+          </div>
+        </section>
+
+        <!-- Skills -->
+        <section class="content-section">
+          <h3 class="section-title">Competências</h3>
+          <div class="skills-grid" id="skillsContainer">
+            <span class="skill-badge">JavaScript</span>
+            <span class="skill-badge">React</span>
+            <span class="skill-badge">Python</span>
+          </div>
+        </section>
+
+        <!-- Currículos -->
+        <section class="content-section">
+          <h3 class="section-title">Currículos</h3>
+          <div class="curriculos-list" id="curriculosContainer">
+            <div class="curriculo-item">
+              <div class="curriculo-icon">📄</div>
+              <div class="curriculo-name">Currículo Principal</div>
+              <div class="curriculo-date">Atualizado em 22/02</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Button (para próprio perfil) -->
+  <button class="edit-btn" id="editBtn">✏️</button>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script>
+    redirecionarSeNaoAutenticado();
+
+    const userData = Auth.getUserData();
+    const params = new URLSearchParams(location.search);
+    const candidatoId = params.get('id') || userData.candidato_id;
+
+    // Carregar perfil
+    async function carregarPerfil() {
+      try {
+        const response = await CandidatoAPI.buscarPerfil(candidatoId);
+        const perfil = response.data || response;
+
+        // Atualizar dados
+        document.getElementById('profileName').textContent = perfil.nome || 'Candidato';
+        // use headline from API for profession/title
+        document.getElementById('profileProfissao').textContent = perfil.headline || perfil.profissao || 'Profissional';
+        document.getElementById('profileHeadline').textContent = perfil.headline ? `"${perfil.headline}"` : '';
+        document.getElementById('profileHeadlineInfo').textContent = perfil.headline || '—';
+        document.getElementById('profileBio').textContent = perfil.sobre || perfil.bio || 'Profissional dedicado';
+        document.getElementById('profileEmail').textContent = perfil.email || 'email@example.com';
+        document.getElementById('profileLocation').textContent = perfil.localizacao || 'São Paulo, SP';
+        document.getElementById('aboutText').textContent = perfil.sobre || perfil.bio || 'Sem descrição adicionada ainda';
+        document.getElementById('statCandidaturas').textContent = perfil.candidaturas || 0;
+        document.getElementById('statVisualizacoes').textContent = perfil.visualizacoes || 0;
+        // preencher habilidades e idiomas se existirem
+        if (perfil.curriculo && perfil.curriculo.habilidades) {
+          document.getElementById('profileHabilidades').textContent = perfil.curriculo.habilidades.join(', ');
+        }
+        if (perfil.curriculo && perfil.curriculo.idiomas) {
+          document.getElementById('profileIdiomas').textContent = perfil.curriculo.idiomas.join(', ');
+        }
+
+        // Avatar
+        const initial = perfil.nome?.[0]?.toUpperCase() || '';
+        document.getElementById('profileAvatar').textContent = initial;
+        document.getElementById('userAvatar').textContent = initial;
+
+        // Mostrar botão de editar apenas para seu próprio perfil
+        if (candidatoId == userData.candidato_id) {
+          document.getElementById('editBtn').classList.add('show');
+          document.getElementById('profileActions').innerHTML = `
+            <button class="btn-small btn-message" onclick="alert('Funcionalidade de edição será implementada em breve')">✏️ Editar</button>
+            <button class="btn-small btn-save" onclick="location.href='feed-candidato.html'">← Voltar</button>
+          `;
+        } else {
+          document.getElementById('profileActions').innerHTML = `
+            <button class="btn-small btn-message">💬 Mensagem</button>
+            <button class="btn-small btn-save">⭐ Salvar</button>
+          `;
+        }
+
+        // Carregar dados adicionais
+        carregarExperiencias();
+        carregarCurrículos();
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        mostrarNotificacao('Erro', 'Não foi possível carregar o perfil', 'error');
+      }
+    }
+
+    // Carregar experiências
+    async function carregarExperiencias() {
+      try {
+        const experiências = [
+          {
+            titulo: 'Desenvolvedor Frontend',
+            empresa: 'Tech Company',
+            periodo: 'Jan 2024 - Presente',
+            descricao: 'Desenvolvimento de interfaces web moderna com React e JavaScript'
+          },
+          {
+            titulo: 'Estagiário em Desenvolvimento',
+            empresa: 'StartUp XYZ',
+            periodo: 'Jun 2023 - Dez 2023',
+            descricao: 'Assistência em desenvolvimento de projetos web e mobile'
+          }
+        ];
+
+        const html = experiências.map(exp => `
+          <div class="experience-item">
+            <div class="item-header">
+              <div>
+                <div class="item-title">${exp.titulo}</div>
+                <div class="item-company">${exp.empresa}</div>
+              </div>
+              <div class="item-period">${exp.periodo}</div>
+            </div>
+            <p class="item-description">${exp.descricao}</p>
+          </div>
+        `).join('');
+
+        document.getElementById('experienceContainer').innerHTML = html || '<p style="color: var(--text-light); text-align: center;">Sem experiências adicionadas</p>';
+      } catch (error) {
+        console.error('Erro ao carregar experiências:', error);
+      }
+    }
+
+    // Carregar currículos
+    async function carregarCurrículos() {
+      try {
+        const response = await CandidatoAPI.buscarCurriculosDoCandidato(candidatoId);
+        // Implementar lógica de currículos
+      } catch (error) {
+        console.error('Erro ao carregar currículos:', error);
+      }
+    }
+
+    // Edit Button
+    document.getElementById('editBtn').addEventListener('click', () => {
+      alert('Funcionalidade de edição será implementada em breve');
+    });
+
+    // Logout
+    document.getElementById('userAvatar').addEventListener('click', () => {
+      if (confirm('Deseja fazer logout?')) {
+        Auth.logout();
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Carregar ao abrir página
+    carregarPerfil();
+  </script>
+</body>
+</html>

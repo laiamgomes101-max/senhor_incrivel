@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed do Candidato - CurriculoHub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    :root{
+      --primary: #667eea;
+      --primary-2: #764ba2;
+      --text-primary:#1a1a1a;
+      --text-secondary:#666;
+      --bg-dark: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      --card-bg: rgba(255,255,255,0.95);
+      --card-radius: 16px;
+      --transition: 0.25s ease;
+    }
+
+    body{ font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); min-height:100vh; }
+
+    .card-base{ background: var(--card-bg); backdrop-filter: blur(8px); border-radius: var(--card-radius); box-shadow: 0 18px 50px rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.06); }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 250px 1fr 300px;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar Esquerda */
+    .sidebar-left {
+      position: sticky;
+      top: 70px;
+      height: fit-content;
+    }
+
+    .sidebar-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+    }
+      .sidebar-card.card-base{ padding:1.25rem; }
+
+    .user-profile-card {
+      text-align: center;
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 60px;
+      border-radius: 12px 12px 0 0;
+      margin: -1.5rem -1.5rem 0 -1.5rem;
+    }
+
+    .profile-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      border: 4px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      margin: -40px auto 1rem;
+      font-weight: 600;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      transition: all var(--transition);
+      cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-link:hover {
+      background: var(--bg-secondary);
+      color: var(--primary);
+    }
+
+    .sidebar-link.active {
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    /* Feed Principal */
+    .feed-container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .post-composer {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+    }
+      .post-composer.card-base{ padding:1rem; }
+
+    .composer-header {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .composer-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .composer-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all var(--transition);
+    }
+
+    .composer-input:hover,
+    .composer-input:focus {
+      background: white;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .composer-actions {
+      display: flex;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .composer-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      transition: all var(--transition);
+      flex: 1;
+      justify-content: center;
+    }
+
+    .composer-action:hover {
+      background: var(--bg-secondary);
+      color: var(--primary);
+    }
+
+    /* Post */
+    .post {
+      background: white;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+      transition: all var(--transition);
+      overflow: hidden;
+    }
+
+    .post:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 1.5rem 1.5rem 1rem;
+    }
+
+    .post-author {
+      display: flex;
+      gap: 0.75rem;
+      flex: 1;
+    }
+
+    .post-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .post-info h4 {
+      margin: 0;
+      color: var(--text-primary);
+    }
+
+    .post-info p {
+      margin: 0.25rem 0 0;
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+
+    .post-menu {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0;
+    }
+
+    .post-content {
+      padding: 0 1.5rem 1rem;
+    }
+
+    .post-text {
+      color: var(--text-primary);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .post-image {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .post-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-around;
+      gap: 1rem;
+    }
+
+    .post-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex: 1;
+      padding: 0.5rem;
+      cursor: pointer;
+      color: var(--text-secondary);
+      border-radius: 8px;
+      transition: all var(--transition);
+      border: none;
+      background: none;
+      font-size: 1rem;
+    }
+
+    .post-action:hover {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* Sidebar Direita */
+    .sidebar-right {
+      position: sticky;
+      top: 70px;
+      height: fit-content;
+    }
+
+    .widget {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-light);
+    }
+      .widget.card-base{ padding:0.9rem; }
+
+    .widget-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .trending-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .trending-item:last-child {
+      border-bottom: none;
+    }
+
+    .trending-item:hover {
+      background: var(--bg-secondary);
+      margin: 0 -1.5rem;
+      padding: 1rem 1.5rem;
+    }
+
+    .trending-title {
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .trending-count {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .vaga-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .vaga-item:last-child {
+      border-bottom: none;
+    }
+
+    .vaga-title {
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .vaga-empresa {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .vaga-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary-light);
+      color: var(--primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all var(--transition);
+      width: 100%;
+    }
+
+    .vaga-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* Loading */
+    .loading-posts {
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    /* Responsivo */
+    @media (max-width: 1200px) {
+      .main-layout {
+        grid-template-columns: 1fr 300px;
+        padding: 1rem;
+      }
+
+      .sidebar-left {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar-right {
+        display: none;
+      }
+
+      .post {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">Currículos</div>
+      <ul class="navbar-nav">
+        <li><a href="feed-candidato.html" class="nav-link active">Feed</a></li>
+        <li><a href="#" class="nav-link">Mensagens</a></li>
+        <li><a href="#" class="nav-link">Notificações</a></li>
+      </ul>
+      <div class="user-menu">
+        <div id="userAvatar" class="user-avatar"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Layout Principal -->
+  <div class="container-lg">
+    <div class="main-layout">
+      <!-- Sidebar Esquerda -->
+      <aside class="sidebar-left">
+        <div class="sidebar-card user-profile-card" id="profileCard">
+          <div class="profile-header"></div>
+          <div id="userInitial" class="profile-avatar"></div>
+          <h4 id="userName" style="margin-bottom: 0.25rem;">Carregando...</h4>
+          <p id="userType" style="margin: 0.5rem 0; color: var(--text-light); font-size: 0.875rem;">Candidato</p>
+          <a href="#" id="viewProfileBtn" style="color: var(--primary); font-weight: 600; text-decoration: none;">Ver perfil →</a>
+        </div>
+
+        <div class="sidebar-card">
+          <div class="sidebar-link active">Minha Rede</div>
+          <div class="sidebar-link">Minhas Candidaturas</div>
+          <div class="sidebar-link">Vagas Salvas</div>
+        </div>
+      </aside>
+
+      <!-- Feed Principal -->
+      <main class="feed-container">
+        <!-- Post Composer -->
+        <div class="post-composer">
+          <div class="composer-header">
+            <div id="composerAvatar" class="composer-avatar"></div>
+            <input type="text" class="composer-input" placeholder="Comece uma postagem..." id="composerInput">
+          </div>
+          <div class="composer-actions">
+            <div class="composer-action">Foto</div>
+            <div class="composer-action">Vídeo</div>
+            <div class="composer-action">Documento</div>
+          </div>
+        </div>
+
+        <!-- Posts -->
+        <div id="feedPosts">
+          <div class="loading-posts">
+            <div class="loader"></div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Sidebar Direita -->
+      <aside class="sidebar-right">
+        <!-- Trending -->
+        <div class="widget">
+          <div class="widget-title">Em Alta</div>
+          <div id="trendingContainer">
+            <div class="loading-posts">
+              <div class="loader"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Vagas Recomendadas -->
+        <div class="widget">
+          <div class="widget-title">Vagas para Você</div>
+          <div id="vagasContainer">
+            <div class="loading-posts">
+              <div class="loader"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="api.js"></script>
+  <script>
+    // Verificar autenticação
+    redirectIfNotCandidato();
+
+    // Carregar dados do usuário
+    async function loadUserData() {
+      const userData = api.userData;
+      document.getElementById('userName').textContent = userData.nome || userData.email?.split('@')[0] || 'Usuário';
+      
+      const initials = userData.nome?.[0]?.toUpperCase() || userData.email?.[0]?.toUpperCase() || 'A';
+      document.getElementById('userInitial').textContent = initials;
+      document.getElementById('composerAvatar').textContent = initials;
+
+      // Atualizar avatar da navbar
+      const userAvatarEl = document.getElementById('userAvatar');
+      userAvatarEl.textContent = initials;
+      userAvatarEl.style.cursor = 'pointer';
+      userAvatarEl.addEventListener('click', () => {
+        if (confirm('Deseja fazer logout?')) {
+          api.logout();
+          window.location.href = 'login.html';
+        }
+      });
+    }
+
+    // Carregar Vagas em tempo real
+    async function loadRecommendedVagas() {
+      try {
+        console.log('Carregando vagas...', api);
+        document.getElementById('vagasContainer').innerHTML = '<div class="loading-posts"><p>Carregando vagas...</p></div>';
+        
+        const responseFeed = await api.listVagas(1, 10);
+        console.log('Resposta da API:', responseFeed);
+        const vagas = responseFeed.vagas || [];
+
+        if (vagas.length === 0) {
+          document.getElementById('vagasContainer').innerHTML = '<p style="color: var(--text-light); font-size: 0.875rem;">Nenhuma vaga disponível no momento.</p>';
+          return;
+        }
+
+        const vagasHtml = vagas.slice(0, 5).map(vaga => `
+          <div class="vaga-item">
+            <div class="vaga-title">${vaga.titulo}</div>
+            <div class="vaga-empresa">${vaga.empresa || 'Empresa Anônima'}</div>
+            <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 0.5rem;">${vaga.tipo_contrato || 'Tipo não especificado'} • ${vaga.localizacao || 'Localização não especificada'}</div>
+            <button class="vaga-btn" onclick="candidatarParaVaga(${vaga.id})">Candidatar-se</button>
+          </div>
+        `).join('');
+
+        console.log('HTML gerado:', vagasHtml);
+        document.getElementById('vagasContainer').innerHTML = vagasHtml;
+      } catch (error) {
+        console.error('Erro ao carregar vagas:', error);
+        document.getElementById('vagasContainer').innerHTML = '<p style="color: red; font-size: 0.875rem;">Erro ao carregar vagas: ' + error.message + '</p>';
+      }
+    }
+
+    // Candidatar para uma vaga
+    async function candidatarParaVaga(vagaId) {
+      try {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        const result = await api.createCandidatura(vagaId);
+        
+        alert('Candidatura enviada com sucesso! ID: ' + result.candidatura_id);
+        btn.textContent = 'Candidatado ✓';
+        btn.style.background = '#4caf50';
+      } catch (error) {
+        console.error('Erro ao candidatar:', error);
+        alert('Erro: ' + error.message);
+        event.target.disabled = false;
+        event.target.textContent = 'Candidatar-se';
+      }
+    }
+
+    // Carregar trending (placeholder)
+    function loadTrending() {
+      const trendingHtml = `
+        <div class="trending-item">
+          <div class="trending-title">#emprego</div>
+          <div class="trending-count">1.2K menções</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-title">#desenvolvedor</div>
+          <div class="trending-count">856 menções</div>
+        </div>
+        <div class="trending-item">
+          <div class="trending-title">#python</div>
+          <div class="trending-count">642 menções</div>
+        </div>
+      `;
+      document.getElementById('trendingContainer').innerHTML = trendingHtml;
+    }
+
+    // Carregar posts placeholder
+    function loadPosts() {
+      const postsHtml = `
+        <p style="text-align: center; color: var(--text-light); padding: 2rem;">
+          Feed em desenvolvimento. Confira as vagas recomendadas!
+        </p>
+      `;
+      document.getElementById('feedPosts').innerHTML = postsHtml;
+    }
+
+    // Aguardar que o api.js esteja carregado
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM Loaded, api disponível?', typeof api !== 'undefined');
+      
+      // Pequeno delay para garantir que api.js foi executado
+      setTimeout(() => {
+        console.log('Iniciando funções, api:', typeof api);
+        if (typeof api !== 'undefined') {
+          // Verificar permissão de acesso
+          redirectIfNotCandidato();
+          
+          loadUserData();
+          loadPosts();
+          loadTrending();
+          loadRecommendedVagas();
+        } else {
+          console.error('API não carregada!');
+          document.getElementById('vagasContainer').innerHTML = '<p style="color: red;">Erro ao carregar API. Recarregue a página.</p>';
+        }
+      }, 150);
+    });
+  </script>
+</body>
+</html>

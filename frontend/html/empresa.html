@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Empresa - CurriculoHub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    .company-header-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      height: 200px;
+      margin: -2rem -2rem 0 -2rem;
+    }
+
+    .profile-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .profile-main {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    .profile-sidebar {
+      position: sticky;
+      top: 80px;
+      height: fit-content;
+    }
+
+    .profile-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem 1.5rem;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .company-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 12px;
+      background: var(--primary-light);
+      border: 4px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin: -70px auto 1rem;
+      font-weight: 600;
+    }
+
+    .company-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .company-industry {
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .company-size {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .company-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .company-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-small {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .btn-follow {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-follow:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-contact {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .btn-contact:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    .sidebar-link {
+      padding: 0.5rem 0;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .sidebar-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Content */
+    .profile-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .content-section {
+      margin-bottom: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .content-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .company-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-item {
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+    }
+
+    .info-label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .info-value {
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .vagas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .vaga-card {
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      padding: 1.5rem;
+      border: 2px solid var(--border-light);
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+
+    .vaga-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-4px);
+    }
+
+    .vaga-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .vaga-type {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .vaga-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .vaga-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-light);
+    }
+
+    .vaga-location {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .vaga-apply-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all var(--transition);
+    }
+
+    .vaga-apply-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .edit-btn {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+
+    .edit-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.1);
+    }
+
+    .edit-btn.show {
+      display: flex;
+    }
+
+    @media (max-width: 768px) {
+      .profile-main {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-sidebar {
+        position: static;
+      }
+
+      .vagas-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .company-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="feed-empresa.html" class="navbar-brand">Currículos</a>
+      <ul class="navbar-nav">
+        <li><a href="feed-empresa.html" class="nav-link">Dashboard</a></li>
+        <li><a href="#" class="nav-link">Mensagens</a></li>
+        <li><a href="#" class="nav-link">Notificações</a></li>
+      </ul>
+      <div class="user-menu">
+        <div class="user-avatar" id="userAvatar"></div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <div class="company-header-bg"></div>
+
+  <!-- Profile Container -->
+  <div class="profile-container">
+    <div class="profile-main">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="profile-card">
+          <div id="companyLogo" class="company-logo"></div>
+          <h2 id="companyName" class="company-name">Carregando...</h2>
+          <p id="companyIndustry" class="company-industry">Tecnologia</p>
+          <p id="companySize" class="company-size">100-500 funcionários</p>
+
+          <div class="company-stats">
+            <div class="stat">
+              <div class="stat-number" id="statVagas">0</div>
+              <div class="stat-label">Vagas Ativas</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number" id="statFollowers">0</div>
+              <div class="stat-label">Seguidores</div>
+            </div>
+          </div>
+
+          <div class="company-actions" id="companyActions">
+            <button class="btn-small btn-follow">Seguir</button>
+            <button class="btn-small btn-contact">Contato</button>
+          </div>
+          <!-- link para configurações -->
+          <a href="config.html" class="sidebar-link" style="margin-top:0.5rem; display:block; text-align:center;">Configurações</a>
+        </div>
+
+        <div class="profile-card" style="text-align: left;">
+          <h4 style="margin-bottom: 1rem;">Informações</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Sede:</strong> <span id="companyLocation">São Paulo, SP</span>
+          </p>
+          <p style="font-size: 0.9rem; margin-bottom: 0.75rem;">
+            <strong>Website:</strong> <span id="companyWebsite">www.empresa.com</span>
+          </p>
+          <p style="font-size: 0.9rem;">
+            <strong>Email:</strong> <span id="companyEmail">contato@empresa.com</span>
+          </p>
+        </div>
+
+        <div class="profile-card">
+          <p style="font-size: 0.85rem; color: var(--text-light); margin: 0;">
+            <strong>Dica:</strong> Acompanhe esta empresa para receber notificações sobre novas vagas!
+          </p>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="profile-content">
+        <!-- Sobre -->
+        <section class="content-section">
+          <h3 class="section-title">Sobre</h3>
+          <p id="aboutText">
+            Somos uma empresa focada em inovação e tecnologia, comprometida em entregar as melhores soluções para nossos clientes e oferecer um ambiente de trabalho excepcional para nossa equipe.
+          </p>
+        </section>
+
+        <!-- Informações da Empresa -->
+        <section class="content-section">
+          <h3 class="section-title">Informações</h3>
+          <div class="company-info">
+            <div class="info-item">
+              <div class="info-label">Setor</div>
+              <div class="info-value" id="infoSetor">Tecnologia</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Tamanho</div>
+              <div class="info-value" id="infoTamanho">100-500</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Fundação</div>
+              <div class="info-value" id="infoFundacao">2015</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Vagas Abertas</div>
+              <div class="info-value" id="infoVagas">12</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Vagas Abertas -->
+        <section class="content-section">
+          <h3 class="section-title">Vagas Abertas</h3>
+          <div class="vagas-grid" id="vagasContainer">
+            <p style="grid-column: 1 / -1; text-align: center; color: var(--text-light);">Carregando vagas...</p>
+          </div>
+        </section>
+
+        <!-- Cultura -->
+        <section class="content-section">
+          <h3 class="section-title">Nossa Cultura</h3>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;"></div>
+              <strong style="display: block; font-size: 0.9rem;">Inovação</strong>
+            </div>
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;"></div>
+              <strong style="display: block; font-size: 0.9rem;">Colaboração</strong>
+            </div>
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;"></div>
+              <strong style="display: block; font-size: 0.9rem;">Crescimento</strong>
+            </div>
+            <div style="padding: 1rem; background: var(--bg-secondary); border-radius: 8px; text-align: center;">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;"></div>
+              <strong style="display: block; font-size: 0.9rem;">Ética</strong>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Edit Button (para próprio perfil) -->
+  <button class="edit-btn" id="editBtn">Editar</button>
+
+  <!-- Scripts -->
+  <script src="assets/js/api.js"></script>
+  <script>
+    redirecionarSeNaoAutenticado();
+
+    const userData = Auth.getUserData();
+    const params = new URLSearchParams(location.search);
+    const empresaId = params.get('id') || userData.empresa_id;
+
+    // Carregar perfil da empresa
+    async function carregarPerfil() {
+      try {
+        const response = await EmpresaAPI.buscarPerfil(empresaId);
+        const perfil = response.data || response;
+
+        // Atualizar dados
+        document.getElementById('companyName').textContent = perfil.nome || 'Empresa';
+        document.getElementById('companyIndustry').textContent = perfil.setor || 'Tecnologia';
+        document.getElementById('companySize').textContent = perfil.tamanho || '100-500 funcionários';
+        document.getElementById('companyLocation').textContent = perfil.localizacao || 'São Paulo, SP';
+        document.getElementById('companyEmail').textContent = perfil.email || 'contato@empresa.com';
+        document.getElementById('companyWebsite').textContent = perfil.website || 'www.empresa.com';
+        document.getElementById('aboutText').textContent = perfil.descricao || 'Sem descrição adicionada ainda';
+        document.getElementById('infoSetor').textContent = perfil.setor || 'Tecnologia';
+        document.getElementById('infoTamanho').textContent = perfil.tamanho || 'N/A';
+        document.getElementById('infoFundacao').textContent = perfil.ano_fundacao || '2015';
+        document.getElementById('statVagas').textContent = perfil.vagas_ativas || 0;
+        document.getElementById('statFollowers').textContent = perfil.seguidores || 0;
+
+        // Logo
+        const initial = perfil.nome?.[0]?.toUpperCase() || '';
+        document.getElementById('companyLogo').textContent = initial;
+        document.getElementById('userAvatar').textContent = initial;
+
+        // Mostrar botão de editar apenas para sua própria empresa
+        if (empresaId == userData.empresa_id) {
+          document.getElementById('editBtn').classList.add('show');
+          document.getElementById('companyActions').innerHTML = `
+            <button class="btn-small btn-follow" onclick="window.location.href='minhas-vagas.html'">Gerenciar Vagas</button>
+            <button class="btn-small btn-contact" onclick="location.href='feed-empresa.html'">Voltar</button>
+          `;
+        }
+
+        // Carregar vagas
+        carregarVagas();
+      } catch (error) {
+        console.error('Erro ao carregar perfil:', error);
+        mostrarNotificacao('Erro', 'Não foi possível carregar o perfil da empresa', 'error');
+      }
+    }
+
+    // Carregar vagas da empresa
+    async function carregarVagas() {
+      try {
+        const response = await EmpresaAPI.buscarVagas(empresaId);
+        const vagas = response.data?.vagas || [];
+
+        const html = vagas.length > 0
+          ? vagas.map(vaga => `
+              <div class="vaga-card">
+                <div class="vaga-title">${vaga.titulo || 'Vaga'}</div>
+                <div class="vaga-type">${vaga.tipo_contrato || 'Permanente'}</div>
+                <p class="vaga-description">${truncarTexto(vaga.descricao, 100) || 'Sem descrição'}</p>
+                <div class="vaga-footer">
+                  <span class="vaga-location">${vaga.localizacao || 'Remoto'}</span>
+                  <button class="vaga-apply-btn" onclick="candidatarAVaga(${vaga.id})">Candidatar</button>
+                </div>
+              </div>
+            `).join('')
+          : '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-light);">Nenhuma vaga aberta no momento</p>';
+
+        document.getElementById('vagasContainer').innerHTML = html;
+      } catch (error) {
+        console.error('Erro ao carregar vagas:', error);
+        document.getElementById('vagasContainer').innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-danger);">Erro ao carregar vagas</p>';
+      }
+    }
+
+    // Candidatar a uma vaga
+    function candidatarAVaga(vagaId) {
+      const curriculoId = userData.candidato_id || 1;
+      
+      VagaAPI.candidatar(vagaId, curriculoId)
+        .then(() => {
+          mostrarNotificacao('Sucesso', 'Candidatura enviada com sucesso!', 'success');
+        })
+        .catch((error) => {
+          mostrarNotificacao('Erro', error.message, 'error');
+        });
+    }
+
+    // Edit Button
+    document.getElementById('editBtn').addEventListener('click', () => {
+      alert('Funcionalidade de edição será implementada em breve');
+    });
+
+    // Logout
+    document.getElementById('userAvatar').addEventListener('click', () => {
+      if (confirm('Deseja fazer logout?')) {
+        Auth.logout();
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Carregar ao abrir página
+    carregarPerfil();
+  </script>
+</body>
+</html>

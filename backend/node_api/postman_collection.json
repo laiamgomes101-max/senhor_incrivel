@@ -1,0 +1,170 @@
+{
+  "info": {
+    "name": "Análise de Currículo - Candidaturas",
+    "description": "Coleção de testes para o sistema de análise de currículo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Analisar Currículo de Candidatura",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/candidatura/{{candidatura_id}}/analisar",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "candidatura", "{{candidatura_id}}", "analisar"]
+        },
+        "description": "Analisar currículo de um candidato usando IA Flask"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Histórico de Análises",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/candidatura/{{candidatura_id}}/historico",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "candidatura", "{{candidatura_id}}", "historico"]
+        },
+        "description": "Obter histórico de análises de um candidato"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Dados do Candidato",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/candidatura/{{candidatura_id}}/dados",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "candidatura", "{{candidatura_id}}", "dados"]
+        },
+        "description": "Obter dados completos do candidato"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Pergunta à IA",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pergunta\": \"Qual é a experiência deste candidato com React?\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/candidatura/{{candidatura_id}}/chat-ia",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "candidatura", "{{candidatura_id}}", "chat-ia"]
+        },
+        "description": "Fazer pergunta à IA sobre um candidato"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Listar Candidatos da Vaga",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/vaga/{{vaga_id}}/candidatos",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "vaga", "{{vaga_id}}", "candidatos"]
+        },
+        "description": "Listar todos os candidatos de uma vaga com dados resumidos"
+      },
+      "response": []
+    },
+    {
+      "name": "6. Comparar Candidatos",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token_empresa}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"candidatura_ids\": [1, 2, 3]\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/curriculo-analysis/vaga/{{vaga_id}}/comparar",
+          "host": ["{{base_url}}"],
+          "path": ["api", "curriculo-analysis", "vaga", "{{vaga_id}}", "comparar"]
+        },
+        "description": "Comparar múltiplos candidatos de uma vaga"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "token_empresa",
+      "value": "seu_token_jwt_empresa_aqui",
+      "type": "string"
+    },
+    {
+      "key": "token_candidato",
+      "value": "seu_token_jwt_candidato_aqui",
+      "type": "string"
+    },
+    {
+      "key": "vaga_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "candidatura_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}

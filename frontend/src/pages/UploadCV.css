@@ -1,0 +1,23 @@
+.upload-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  text-align: center;
+}
+.upload-form input {
+  display: block;
+  margin: 1rem auto;
+}
+.upload-form button {
+  padding: 0.5rem 1rem;
+}
+.upload-note {
+  margin: 0 auto 1.5rem;
+  max-width: 520px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+.message {
+  margin-top: 1rem;
+  color: green;
+}

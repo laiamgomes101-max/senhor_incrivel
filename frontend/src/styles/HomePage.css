@@ -1,0 +1,321 @@
+/* Landing page specific styles */
+.landing-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: auto;
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 24%),
+    radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.06), transparent 20%);
+  color: var(--text-primary, #f8fafc);
+}
+
+.landing-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.landing-glow-large {
+  width: 22rem;
+  height: 22rem;
+  top: 4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.landing-glow-purple {
+  width: 12rem;
+  height: 12rem;
+  right: 4rem;
+  top: 8rem;
+  background: rgba(168, 85, 247, 0.14);
+}
+
+.landing-glow-pink {
+  width: 9rem;
+  height: 9rem;
+  right: 2.5rem;
+  top: 18rem;
+  background: linear-gradient(135deg, rgba(96,165,250,0.18), rgba(167,139,250,0.14));
+  box-shadow: 0 16px 60px rgba(99, 102, 241, 0.12);
+}
+
+.landing-dot {
+  position: absolute;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(15, 23, 42, 0.04);
+}
+
+.landing-dot-top {
+  top: 5rem;
+  right: 6rem;
+}
+
+.landing-dot-bottom {
+  bottom: 4rem;
+  right: 5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.landing-theme-toggle {
+  position: absolute;
+  right: 1.25rem;
+  top: 1.25rem;
+  z-index: 40;
+}
+
+.landing-nav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1rem 0;
+  gap: 1rem;
+}
+
+.landing-nav-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+}
+
+.landing-nav-info span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.65rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.landing-nav-no-brand {
+  padding-top: 1.25rem;
+}
+
+.landing-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.landing-card-top-left {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  max-width: 360px;
+  z-index: 10;
+}
+
+.landing-card-top-left .auto-card {
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+}
+
+.landing-link,
+.landing-button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  border-radius: 999px;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.landing-link {
+  padding: 0.75rem 1rem;
+  color: rgba(226, 232, 240, 0.9);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.landing-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.landing-button,
+.btn-primary {
+  padding: 0.85rem 1.45rem;
+  color: #0f172a;
+  background: #ffffff;
+  box-shadow: 0 26px 60px rgba(255, 255, 255, 0.14);
+}
+
+.landing-button:hover,
+.btn-primary:hover {
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  padding: 0.5rem 0.9rem;
+  color: #ffffff;
+  /* botão minimalista: fundo levemente mais claro que o card, sem borda forte */
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.landing-main {
+  position: relative;
+  z-index: 2;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 3rem 1rem 1.5rem;
+  text-align: center;
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.landing-eyebrow {
+  display: inline-block;
+  margin-bottom: 0.95rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.25em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+.landing-title {
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  line-height: 1;
+  margin-bottom: 1rem;
+  letter-spacing: -0.05em;
+}
+
+.landing-title span {
+  display: block;
+}
+
+.landing-title-highlight {
+  background: linear-gradient(90deg, #38bdf8, #8b5cf6, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-subtitle {
+  max-width: 38rem;
+  margin: 0 auto 1rem;
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.landing-description {
+  max-width: 38rem;
+  margin: 0 auto;
+  color: #94a3b8;
+  font-size: 0.98rem;
+  line-height: 1.8;
+}
+
+  .landing-cta {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.4rem;
+  }
+
+.landing-panel {
+  display: none;
+}
+
+.landing-panel-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  color: #f8fafc;
+  font-size: 0.96rem;
+}
+
+.landing-panel-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+@media (max-width: 640px) {
+  .landing-nav {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1rem 1rem 0;
+    gap: 1rem;
+  }
+
+  .landing-nav-info {
+    justify-content: center;
+  }
+
+  .landing-main {
+    padding-top: 1.5rem;
+  }
+
+  .landing-cta {
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .landing-title {
+    font-size: clamp(2.5rem, 10vw, 3.75rem);
+  }
+}
+
+/* AutoCard component styles */
+.auto-card {
+  display: inline-block;
+  min-width: 320px;
+  max-width: 420px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 12px 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.45);
+  color: var(--text-primary, #fff);
+  transition: transform 600ms ease, opacity 600ms ease;
+  opacity: 1;
+}
+
+.auto-card-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auto-card-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.auto-card-text {
+  font-size: 0.92rem;
+  color: #cbd5e1;
+}
+
+@media (max-width: 640px) {
+  .auto-card { min-width: 100%; max-width: 100%; }
+}

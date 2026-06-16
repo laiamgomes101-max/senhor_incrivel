@@ -1,0 +1,249 @@
+﻿import notificacaoService from '../services/notificacaoService.js';
+
+class NotificacaoController {
+  async createNotificacao(req, res) {
+    try {
+
+      if (req.user.tipo !== 'admin') {
+        return res.status(403).json({ error: 'Apenas administradores podem criar notificações' });
+      }
+
+      const notificacao = await notificacaoService.createNotificacao(req.body);
+      res.status(201).json({
+        message: 'Notificação criada com sucesso',
+        data: notificacao
+      });
+    } catch (error) {
+      console.error('Erro ao criar notificação:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getNotificacaoById(req, res) {
+    try {
+      const { id } = req.params;
+      const notificacao = await notificacaoService.getNotificacaoById(id);
+
+
+      if (notificacao.usuario_id !== req.user.id && req.user.tipo !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      res.json({ data: notificacao });
+    } catch (error) {
+      console.error('Erro ao buscar notificação:', error);
+      res.status(404).json({ error: error.message });
+    }
+  }
+
+  async getMyNotificacoes(req, res) {
+    try {
+      const filters = {
+        lida: req.query.lida === 'true' ? true : req.query.lida === 'false' ? false : undefined,
+        tipo: req.query.tipo,
+        limit: parseInt(req.query.limit) || 20,
+        offset: parseInt(req.query.offset) || 0
+      };
+
+      const notificacoes = await notificacaoService.getNotificacoesByUsuario(req.user.id, filters);
+      res.json({ data: notificacoes });
+    } catch (error) {
+      console.error('Erro ao buscar notificações:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getNotificacoesNaoLidas(req, res) {
+    try {
+      const notificacoes = await notificacaoService.getNotificacoesNaoLidas(req.user.id);
+      res.json({ data: notificacoes });
+    } catch (error) {
+      console.error('Erro ao buscar notificações não lidas:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async markAsRead(req, res) {
+    try {
+      const { id } = req.params;
+
+      const updatedNotificacao = await notificacaoService.markAsRead(id, req.user.id);
+      res.json({
+        message: 'Notificação marcada como lida',
+        data: updatedNotificacao
+      });
+    } catch (error) {
+      console.error('Erro ao marcar notificação como lida:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async markAllAsRead(req, res) {
+    try {
+      const result = await notificacaoService.markAllAsRead(req.user.id);
+      res.json({
+        message: 'Todas as notificações foram marcadas como lidas',
+        data: result
+      });
+    } catch (error) {
+      console.error('Erro ao marcar todas as notificações como lidas:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async deleteNotificacao(req, res) {
+    try {
+      const { id } = req.params;
+
+      await notificacaoService.deleteNotificacao(id, req.user.id);
+      res.json({ message: 'Notificação deletada com sucesso' });
+    } catch (error) {
+      console.error('Erro ao deletar notificação:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async getNotificacoesByTipo(req, res) {
+    try {
+      const { tipo } = req.params;
+
+      const notificacoes = await notificacaoService.getNotificacoesByTipo(tipo, req.user.id);
+      res.json({ data: notificacoes });
+    } catch (error) {
+      console.error('Erro ao buscar notificações por tipo:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getNotificacoesByDateRange(req, res) {
+    try {
+      const { startDate, endDate } = req.query;
+
+      if (!startDate || !endDate) {
+        return res.status(400).json({ error: 'Parâmetros startDate e endDate são obrigatórios' });
+      }
+
+      const notificacoes = await notificacaoService.getNotificacoesByDateRange(
+        req.user.id,
+        new Date(startDate),
+        new Date(endDate)
+      );
+
+      res.json({ data: notificacoes });
+    } catch (error) {
+      console.error('Erro ao buscar notificações por período:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getNotificacaoStats(req, res) {
+    try {
+      const stats = await notificacaoService.getNotificacaoStats(req.user.id);
+      res.json({ data: stats });
+    } catch (error) {
+      console.error('Erro ao buscar estatísticas das notificações:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async createSystemNotification(req, res) {
+    try {
+
+      if (req.user.tipo !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const { tipo, titulo, mensagem, usuarioId, referenciaId, referenciaTipo } = req.body;
+
+      const notificacao = await notificacaoService.createSystemNotification(
+        tipo,
+        titulo,
+        mensagem,
+        usuarioId,
+        referenciaId,
+        referenciaTipo
+      );
+
+      res.status(201).json({
+        message: 'Notificação do sistema criada com sucesso',
+        data: notificacao
+      });
+    } catch (error) {
+      console.error('Erro ao criar notificação do sistema:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+
+  async createBulkNotifications(req, res) {
+    try {
+
+      if (req.user.tipo !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const { notificacoes } = req.body;
+
+      if (!Array.isArray(notificacoes)) {
+        return res.status(400).json({ error: 'O campo notificacoes deve ser um array' });
+      }
+
+      const results = await notificacaoService.createBulkNotifications(notificacoes);
+      res.json({
+        message: 'Notificações em lote processadas',
+        data: results
+      });
+    } catch (error) {
+      console.error('Erro ao criar notificações em lote:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async archiveOldNotifications(req, res) {
+    try {
+
+      if (req.user.tipo !== 'admin') {
+        return res.status(403).json({ error: 'Acesso negado' });
+      }
+
+      const { daysOld = 30 } = req.body;
+
+      const result = await notificacaoService.archiveOldNotifications(daysOld);
+      res.json({
+        message: `Notificações antigas arquivadas com sucesso`,
+        data: result
+      });
+    } catch (error) {
+      console.error('Erro ao arquivar notificações antigas:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getNotificacoesByReferencia(req, res) {
+    try {
+      const { referenciaId, referenciaTipo } = req.params;
+
+      const notificacoes = await notificacaoService.getNotificacoesByReferencia(referenciaId, referenciaTipo);
+      res.json({ data: notificacoes });
+    } catch (error) {
+      console.error('Erro ao buscar notificações por referência:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  async updateNotificacao(req, res) {
+    try {
+      const { id } = req.params;
+
+      const updatedNotificacao = await notificacaoService.updateNotificacao(id, req.body, req.user.id);
+      res.json({
+        message: 'Notificação atualizada com sucesso',
+        data: updatedNotificacao
+      });
+    } catch (error) {
+      console.error('Erro ao atualizar notificação:', error);
+      res.status(400).json({ error: error.message });
+    }
+  }
+}
+
+export default new NotificacaoController();

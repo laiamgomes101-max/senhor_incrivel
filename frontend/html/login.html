@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Plataforma Currículos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #a49edc, #302b63, #24243e);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle at 20% 50%, rgba(79, 172, 254, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(159, 168, 218, 0.1) 0%, transparent 50%);
+            animation: bgShift 15s ease infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes bgShift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-50px, -50px); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 35px 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .header-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .header-subtitle {
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+        }
+        
+        .toggle-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-btn {
+            flex: 1;
+            padding: 10px 14px;
+            background: #f0f0f0;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+        
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .toggle-btn:hover:not(.active) {
+            background: #e5e5e5;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, #ddd, transparent);
+            margin: 12px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 14px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 9px 11px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 13px;
+            background: #f9f9f9;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        
+        input::placeholder {
+            color: #aaa;
+        }
+        
+        .tipo-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        
+        .tipo-option {
+            position: relative;
+        }
+        
+        .tipo-option input[type="radio"] {
+            display: none;
+        }
+        
+        .tipo-label {
+            display: block;
+            padding: 9px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+        
+        .tipo-option input[type="radio"]:checked + .tipo-label {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+        
+        .alert {
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            display: none;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+        
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.3s;
+        }
+        
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 6px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsividade */
+        @media (max-height: 700px) {
+            .auth-card {
+                padding: 30px 25px;
+            }
+            
+            .header-section {
+                margin-bottom: 15px;
+            }
+            
+            .header-title {
+                font-size: 22px;
+            }
+            
+            .form-group {
+                margin-bottom: 12px;
+            }
+            
+            label {
+                margin-bottom: 3px;
+                font-size: 11px;
+            }
+            
+            input {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .auth-card {
+                border-radius: 16px;
+                padding: 30px 20px;
+            }
+            
+            .header-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-card">
+            <!-- Header -->
+            <div class="header-section">
+                <h1 class="header-title">Currículos</h1>
+                <p class="header-subtitle">Plataforma de oportunidades</p>
+            </div>
+            
+            <!-- Toggle Login/Cadastro -->
+            <div class="toggle-section">
+                <button type="button" class="toggle-btn active" data-mode="login">Login</button>
+                <button type="button" class="toggle-btn" data-mode="signup">Cadastro</button>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <!-- Alertas -->
+            <div class="alert error" id="alert-error">
+                <span id="error-text"></span>
+            </div>
+            <div class="alert success" id="alert-success">
+                <span id="success-text"></span>
+            </div>
+            
+            <!-- FORMULÁRIO LOGIN -->
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" placeholder="seu@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="login-password">Senha</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="spinner hidden" id="login-spinner"></span>
+                    <span>Entrar</span>
+                </button>
+            </form>
+            
+            <!-- FORMULÁRIO CADASTRO -->
+            <form id="signupForm" class="auth-form hidden">
+                <div class="form-group">
+                    <label>Tipo de Usuário</label>
+                    <div class="tipo-group">
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo-candidato" name="tipo" value="candidato" checked>
+                            <label for="tipo-candidato" class="tipo-label">Candidato</label>
+                        </div>
+                        <div class="tipo-option">
+                            <input type="radio" id="tipo-empresa" name="tipo" value="empresa">
+                            <label for="tipo-empresa" class="tipo-label">Empresa</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-email">Email</label>
+                    <input type="email" id="signup-email" placeholder="seu@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-name">Nome</label>
+                    <input type="text" id="signup-name" placeholder="Seu nome completo" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password">Senha</label>
+                    <input type="password" id="signup-password" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signup-password-confirm">Confirmar Senha</label>
+                    <input type="password" id="signup-password-confirm" placeholder="••••••••" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">
+                    <span class="spinner hidden" id="signup-spinner"></span>
+                    <span>Criar Conta</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // Elementos
+        const toggleBtns = document.querySelectorAll('.toggle-btn');
+        const authForms = document.querySelectorAll('.auth-form');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const alertError = document.getElementById('alert-error');
+        const alertSuccess = document.getElementById('alert-success');
+        const errorText = document.getElementById('error-text');
+        const successText = document.getElementById('success-text');
+        
+        // Toggle entre Login e Cadastro
+        toggleBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.dataset.mode;
+                
+                // Atualizar botões
+                toggleBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Mostrar/ocultar formulários
+                authForms.forEach(form => form.classList.add('hidden'));
+                if (mode === 'login') {
+                    loginForm.classList.remove('hidden');
+                } else {
+                    signupForm.classList.remove('hidden');
+                }
+                
+                // Limpar alertas
+                alertError.classList.remove('show');
+                alertSuccess.classList.remove('show');
+            });
+        });
+        
+        // FORMULÁRIO LOGIN
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            alertError.classList.remove('show');
+            alertSuccess.classList.remove('show');
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const spinner = document.getElementById('login-spinner');
+            const submitBtn = loginForm.querySelector('.submit-btn');
+            
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro ao fazer login');
+                }
+                
+                // Usar as mesmas chaves do api.js para consistência
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                
+                successText.textContent = 'Login realizado com sucesso!';
+                alertSuccess.classList.add('show');
+                
+                setTimeout(() => {
+                    if (data.user.tipo === 'empresa') {
+                        window.location.href = 'feed-empresa.html';
+                    } else {
+                        window.location.href = 'feed-candidato.html';
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                errorText.textContent = error.message;
+                alertError.classList.add('show');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        });
+        
+        // FORMULÁRIO CADASTRO
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            alertError.classList.remove('show');
+            alertSuccess.classList.remove('show');
+            
+            const tipo = document.querySelector('input[name="tipo"]:checked').value;
+            const email = document.getElementById('signup-email').value;
+            const name = document.getElementById('signup-name').value;
+            const password = document.getElementById('signup-password').value;
+            const passwordConfirm = document.getElementById('signup-password-confirm').value;
+            const spinner = document.getElementById('signup-spinner');
+            const submitBtn = signupForm.querySelector('.submit-btn');
+            
+            // Validar senhas
+            if (password !== passwordConfirm) {
+                errorText.textContent = 'As senhas não correspondem';
+                alertError.classList.add('show');
+                return;
+            }
+            
+            if (password.length < 6) {
+                errorText.textContent = 'A senha deve ter pelo menos 6 caracteres';
+                alertError.classList.add('show');
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+            
+            try {
+                const endpoint = tipo === 'candidato' 
+                    ? 'http://localhost:5000/api/auth/register/candidato'
+                    : 'http://localhost:5000/api/auth/register/empresa';
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        email, 
+                        password,
+                        nome: name
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Erro ao criar conta');
+                }
+                
+                // Usar as mesmas chaves do api.js para consistência
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                
+                successText.textContent = 'Conta criada com sucesso! Redirecionando...';
+                alertSuccess.classList.add('show');
+                
+                setTimeout(() => {
+                    if (data.user.tipo === 'empresa') {
+                        window.location.href = 'feed-empresa.html';
+                    } else {
+                        window.location.href = 'feed-candidato.html';
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                errorText.textContent = error.message;
+                alertError.classList.add('show');
+            } finally {
+                submitBtn.disabled = false;
+                spinner.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

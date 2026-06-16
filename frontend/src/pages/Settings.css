@@ -1,0 +1,100 @@
+.settings-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--text-primary);
+  /* make settings page scrollable on small screens or when content overflows */
+  height: calc(100vh - var(--app-header-height, 72px));
+  box-sizing: border-box;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 3rem; /* ensure space for scrollbar / fixed footer */
+}
+
+.settings-page h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section h2 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.info {
+  background: var(--bg-secondary);
+  padding: 0.6rem 1rem;
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.form label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.form input {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-size: 1rem;
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+.form button {
+  margin-top: 0.5rem;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: 0.6rem 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+}
+
+.alert.error {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+.alert.success {
+  background: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}

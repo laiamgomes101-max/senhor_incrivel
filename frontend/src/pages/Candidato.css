@@ -1,0 +1,540 @@
+.candidato-page {
+  width: 100%;
+  background: var(--bg-primary);
+  min-height: 100vh;
+  overflow-y: auto;
+  padding: 2rem 1.5rem;
+}
+
+.perfil-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  padding: 2.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  max-height: none;
+  overflow-y: visible;
+}
+
+.profile-note {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.delete-curriculo-section {
+  margin-top: 1.5rem;
+}
+
+.btn-danger {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: #c53030;
+}
+
+.btn-danger:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Media Queries para Responsividade Mobile */
+@media (max-width: 768px) {
+  .perfil-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .perfil-header {
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .tabs {
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .tab-item {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  .form-section {
+    max-width: 100%;
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .perfil-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .perfil-header {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+  }
+  
+  .tabs {
+    gap: 0.2rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .tab-item {
+    padding: 0.3rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+}
+
+.perfil-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-item {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem 0.9rem;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab-item.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-bottom: 0;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+
+.perfil-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.3);
+  border: 3px solid var(--bg-primary);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.perfil-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.perfil-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 16px 32px rgba(99, 102, 241, 0.4);
+}
+
+.perfil-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.headline {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.localizacao {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-edit {
+  margin-left: auto;
+  padding: 0.7rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.form-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 500px;
+  background: var(--bg-secondary);
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.form-edit h3 {
+  font-size: 1.1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.form-edit h3:first-child {
+  margin-top: 0;
+}
+
+.form-edit input,
+.form-edit textarea {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.form-edit input:focus,
+.form-edit textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: var(--bg-primary);
+}
+
+..form-edit button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.form-edit button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+}
+
+.experience-input-group {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.form-edit .btn-secondary,
+.form-edit .btn-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.form-edit .btn-secondary {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+
+.form-edit .btn-secondary:hover {
+  background: var(--bg-card);
+}
+
+.form-edit .btn-remove {
+  background: #ffe3e3;
+  color: #b91c1c;
+}
+
+.form-edit .btn-remove:hover {
+  background: #f9d5d5;
+}
+
+section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+section h3 {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+section h3::before {
+  content: '';
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  border-radius: 2px;
+}
+
+section h4 {
+  font-size: 0.95rem;
+  margin: 1.5rem 0 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+section pre {
+  background: var(--bg-secondary);
+  padding: 1.25rem;
+  border-radius: 12px;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+}
+
+.vagas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.vaga-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 1.75rem;
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.vaga-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-muted) 100%);
+}
+
+.vaga-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.2);
+}
+
+.vaga-card h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.vaga-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.vaga-card button {
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.vaga-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.candidato-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.candidato-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(99, 102, 241, 0.2);
+}
+
+.candidato-card h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary);
+}
+
+.candidato-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.candidato-card .local {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.perfil-avatar.pequeno {
+  width: 60px;
+  height: 60px;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.info-item {
+  background: var(--bg-card);
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.info-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  transform: translateY(-2px);
+}
+
+.info-item strong {
+  color: var(--accent);
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.badge {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-muted) 100%);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}

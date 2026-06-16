@@ -1,0 +1,11 @@
+.resultado-page {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+.resultado-page section {
+  margin-bottom: 1.5rem;
+}
+.resultado-page h3 {
+  margin-bottom: 0.5rem;
+}

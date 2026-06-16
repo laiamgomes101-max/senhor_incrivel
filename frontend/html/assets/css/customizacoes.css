@@ -1,0 +1,455 @@
+/**
+ * Exemplos de Customização CSS
+ * Copie e cole no final de assets/css/styles.css para adicionar estes estilos
+ */
+
+/* ==================== TEMAS ALTERNATIVOS ==================== */
+
+/* Tema Verde (Sustentabilidade) */
+:root.theme-green {
+  --primary: #2ac57b;
+  --primary-dark: #21a366;
+  --primary-light: #e8f5f0;
+}
+
+/* Tema Vermelho (Tech/Startup) */
+:root.theme-red {
+  --primary: #ff4757;
+  --primary-dark: #ff3838;
+  --primary-light: #ffe5e7;
+}
+
+/* Tema Roxo (Premium) */
+:root.theme-purple {
+  --primary: #764ba2;
+  --primary-dark: #5f3a85;
+  --primary-light: #f3e5f5;
+}
+
+/* Modo Escuro */
+:root.dark-mode {
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-light: #808080;
+  
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #3a3a3a;
+  
+  --border-color: #404040;
+  --border-light: #2a2a2a;
+}
+
+/* ==================== ANIMAÇÕES CUSTOMIZADAS ==================== */
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+  from { 
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ==================== COMPONENTES EXTRAS ==================== */
+
+/* Avatar com status online */
+.avatar-with-status {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar-with-status::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background: var(--success);
+  border: 3px solid var(--bg-primary);
+  border-radius: 50%;
+}
+
+.avatar-with-status.offline::after {
+  background: var(--text-light);
+}
+
+/* Tag com ícone */
+.tag-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 999px;
+  font-weight: 600;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-light);
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  background: var(--primary);
+  border: 3px solid var(--bg-primary);
+  border-radius: 50%;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Progress Bar */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border-light);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width var(--transition);
+}
+
+/* Tooltip */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  text-align: center;
+  padding: 0.5rem;
+  border-radius: 6px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -50px;
+  opacity: 0;
+  transition: opacity var(--transition);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease;
+}
+
+.modal.show {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background-color: var(--bg-primary);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 90%;
+  animation: slideInRight 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+/* ==================== EFFECTS ==================== */
+
+/* Skeleton Loading */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--border-light) 25%,
+    var(--bg-secondary) 50%,
+    var(--border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Blur Effect (para fundo) */
+.blur-backdrop {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Glass Morphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+}
+
+/* ==================== UTILIDADES ==================== */
+
+/* Flex Center */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Grid Auto */
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Aspect Ratio */
+.aspect-ratio-1x1 {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.aspect-ratio-16x9 {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.aspect-ratio-4x3 {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+/* Line Clamp */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Opacidade */
+.opacity-50 { opacity: 0.5; }
+.opacity-75 { opacity: 0.75; }
+
+/* Transição */
+.transition-all {
+  transition: all var(--transition);
+}
+
+/* Escala no hover */
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-scale-down:hover {
+  transform: scale(0.95);
+}
+
+/* Cor no hover */
+.hover-color:hover {
+  color: var(--primary);
+}
+
+/* Background no hover */
+.hover-bg:hover {
+  background: var(--primary-light);
+}
+
+/* ==================== ESTADO DOS COMPONENTES ==================== */
+
+/* Desabilitado */
+.disabled,
+:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Carregando */
+.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Em foco */
+.is-focused {
+  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: var(--primary);
+}
+
+/* Ativo */
+.is-active {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ==================== ANIMAÇÕES EM HOVER ==================== */
+
+.hover-bounce:hover {
+  animation: bounce 0.6s;
+}
+
+.hover-pulse:hover {
+  animation: pulse 1s infinite;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* ==================== EXEMPLOS DE USO ==================== */
+
+/**
+ * Exemplo 1: Card com timeline
+ * 
+ * <div class="card">
+ *   <div class="timeline">
+ *     <div class="timeline-item">
+ *       <h4>Evento 1</h4>
+ *       <p>Data: 23/02/2026</p>
+ *     </div>
+ *   </div>
+ * </div>
+ */
+
+/**
+ * Exemplo 2: Avatar com status
+ * 
+ * <div class="avatar-with-status">avatar</div>
+ * <div class="avatar-with-status offline">avatar</div>
+ */
+
+/**
+ * Exemplo 3: Progress
+ * 
+ * <div class="progress-bar">
+ *   <div class="progress-bar-fill" style="width: 75%"></div>
+ * </div>
+ */
+
+/**
+ * Exemplo 4: Tooltip
+ * 
+ * <div class="tooltip">
+ *   Hover aqui
+ *   <span class="tooltiptext">Dica importante!</span>
+ * </div>
+ */
+
+/**
+ * Exemplo 5: Tema Escuro
+ * 
+ * <html class="dark-mode">
+ *   ...
+ * </html>
+ */
+
+/**
+ * Exemplo 6: Glassmorphism
+ * 
+ * <div class="glass" style="padding: 2rem;">
+ *   Conteúdo com efeito glass
+ * </div>
+ */

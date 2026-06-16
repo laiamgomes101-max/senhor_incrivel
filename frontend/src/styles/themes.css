@@ -1,0 +1,29 @@
+/* Tema estático padrão (sem alternância clara/escura) */
+:root {
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #111111;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-tertiary: #94a3b8;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-muted: #3b82f6;
+  --border: #374151;
+  --border-hover: #4b5563;
+  --error: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+
+  /* Cores específicas do login */
+  --login-bg-gradient: linear-gradient(135deg, #0f0f12 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
+  --login-card-bg: rgba(34, 34, 40, 0.95);
+  --login-card-border: rgba(99, 102, 241, 0.12);
+  --login-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Transições suaves (mantém UX agradável mesmo sem toggle) */
+* {
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}

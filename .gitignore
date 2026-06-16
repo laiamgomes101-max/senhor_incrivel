@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+.env.local
+.env.production
+*.egg-info/
+.eggs/
+
+# Node
+node_modules/
+dist/
+.env
+.env.local
+.env.production
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+logs/
+backend/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# local sqlite database
+backend/node_api/data.sqlite
+
+# Sensitive environment files - NEVER COMMIT
+.env.mysql
+.env.production.local
+backend/*/.env.production
+backend/flask_app/.env.production
+backend/node_api/.env.production
+
+# Database
+*.db
+*.sqlite
+instance/
+
+# Cache
+.cache/
+.pytest_cache/
+
+# Temporary files
+tmp/
+temp/
+*.tmp

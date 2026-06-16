@@ -1,0 +1,94 @@
+.vagas-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.vaga-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.vaga-card-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.vaga-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: linear-gradient(135deg,#06b6d4,#3b82f6);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vaga-titles h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.empresa-name {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.vaga-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vaga-local {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.tag {
+  display: inline-block;
+  background: rgba(34,197,94,0.08);
+  color: #16a34a;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-right: 6px;
+}
+
+.vaga-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.vaga-modalidade {
+  background: rgba(34,197,94,0.08);
+  color: #16a34a;
+  padding: 0.35rem 0.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.vaga-card .btn-primary {
+  padding: 0.45rem 0.8rem;
+  border-radius: 8px;
+}
+
+@media (max-width: 1000px) {
+  .vagas-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .vagas-grid { grid-template-columns: 1fr; }
+}

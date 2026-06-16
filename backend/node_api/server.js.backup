@@ -1,0 +1,328 @@
+// 1. Importar bibliotecas
+import express from 'express';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
+import cors from 'cors';
+import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import pool from './database.js';
+
+// Importar rotas
+import authRoutes from './routes/auth.js';
+import vagasRoutes from './routes/vagas.js';
+import curriculosRoutes from './routes/curriculos.js';
+import candidaturasRoutes from './routes/candidaturas.js';
+import notificacoesRoutes from './routes/notificacoes.js';
+
+// Importar métricas e logging
+import { register, metricsMiddleware, metrics } from './utils/metrics.js';
+import logger from './utils/logger.js';
+import { businessMetrics } from './utils/businessMetrics.js';
+
+// Importar rate limiting
+import {
+  generalLimiter,
+  authLimiter,
+  uploadLimiter,
+  iaLimiter,
+  vagaLimiter,
+  candidaturaLimiter,
+  wsLimiter,
+  suspiciousActivityDetector,
+  whitelistMiddleware
+} from './middleware/rateLimiter.js';
+
+// Importar cache
+import { 
+  cacheMiddleware, 
+  getCacheStats, 
+  isRedisConnected,
+  userProfileCache,
+  vagasCache,
+  curriculosCache,
+  iaResultsCache
+} from './utils/cache.js';
+
+// 2. Carregar variáveis de ambiente
+dotenv.config();
+
+// 3. Criar aplicação Express
+const app = express();
+
+// 4. Criar servidor HTTP (para Socket.io)
+const server = createServer(app);
+
+// 5. Adicionar middlewares básicos
+app.use(metricsMiddleware);
+app.use(logger.middleware);
+
+// 6. Rate limiting básico
+app.use(generalLimiter);
+
+// 7. Inicialização do esquema SQLite (se necessário)
+if (!process.env.DB_USER) {
+  setTimeout(async () => {
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const sql = fs.readFileSync(path.resolve(path.dirname('./server.js'), 'init_db_sqlite.sql'), 'utf8');
+      
+      // dividir por ponto e vírgula, remover comentários e linhas em branco
+      const statements = sql
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt && !stmt.startsWith('--'));
+
+      console.log('Encontradas', statements.length, 'statements SQL');
+
+      for (const statement of statements) {
+        await pool.query(statement + ';');
+      }
+      console.log('Esquema SQLite inicializado (init_db_sqlite.sql)');
+    } catch (e) {
+      console.error('Falha ao inicializar esquema SQLite:', e);
+    }
+  }, 2000); // Aguardar 2 segundos para garantir inicialização do banco
+}
+
+
+// 5. Inicializar Socket.io com CORS
+const io = new Server(server, {
+  cors: {
+    origin: [
+      'http://localhost:5173',
+      'http://127.0.0.1:5173',
+      'http://localhost:8000',
+      'http://127.0.0.1:8000',
+      'http://localhost:3000'
+    ],
+    methods: ['GET', 'POST'],
+    credentials: true
+  }
+});
+
+// 6. Middlewares
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://localhost:3001'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['X-Total-Count', 'X-Cache']
+}));
+app.use(express.json());
+
+// 7. Variáveis globais para armazenar usuários conectados
+const usuariosConectados = new Map();
+const mensagensArmazenadas = [];
+
+// 8. Rotas HTTP
+app.get('/', (req, res) => {
+  try {
+    logger.api_request('GET', '/', 200);
+    res.json({
+      message: 'Servidor Node.js rodando!',
+      status: 'ok',
+      version: '1.0'
+    });
+  } catch (error) {
+    logger.error('Erro na rota principal', { error: error.message });
+    res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Endpoint de métricas Prometheus
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+  } catch (error) {
+    logger.error('Erro ao gerar métricas', { error: error.message });
+    res.status(500).json({ error: 'Erro ao gerar métricas' });
+  }
+});
+
+app.get('/test', (req, res) => {
+  res.json({ test: 'Conexão Node.js funcionando!' });
+});
+
+// Registrar rotas de autenticação (com rate limit específico)
+app.use('/api/auth', authLimiter, authRoutes);
+
+// Registrar rotas de vagas (com rate limit específico)
+app.use('/api/vagas', vagaLimiter, vagasRoutes);
+
+// Registrar rotas de currículos (com rate limits específicos)
+app.use('/api/curriculos', uploadLimiter, curriculosRoutes);
+
+// Registrar rotas de candidaturas (com rate limit específico)
+app.use('/api/candidaturas', candidaturaLimiter, candidaturasRoutes);
+
+// Registrar rotas de notificações
+app.use('/api/notificacoes', notificacoesRoutes);
+
+// Endpoint para IA processing (com rate limit específico)
+app.post('/api/ia/*', iaLimiter, (req, res) => {
+  res.status(404).json({ error: 'Endpoint IA não encontrado' });
+});
+
+// Endpoint para status do rate limiting
+app.get('/api/rate-limit-status', (req, res) => {
+  const { getRateLimitStatus } = require('./middleware/rateLimiter.js');
+  res.json(getRateLimitStatus());
+});
+
+// Endpoint para status do cache
+app.get('/api/cache-status', async (req, res) => {
+  try {
+    const stats = await getCacheStats();
+    res.json(stats);
+  } catch (error) {
+    logger.error('Erro ao obter status do cache', { error: error.message });
+    res.status(500).json({ error: 'Erro ao obter status do cache' });
+  }
+});
+
+// 9. Socket.io - Eventos de conexão com rate limiting
+io.engine.use(wsLimiter);
+
+io.on('connection', (socket) => {
+  logger.info('Novo usuário conectado', { socketId: socket.id });
+  
+  // Atualizar métricas de conexões ativas
+  metrics.activeConnections.set(usuariosConectados.size + 1);
+  
+  // 10. Evento: Usuário se identifica
+  socket.on('user_login', (data) => {
+    logger.auth('login', data.user_id, { email: data.email, socketId: socket.id });
+    
+    // Armazenar usuário conectado
+    usuariosConectados.set(socket.id, {
+      id: socket.id,
+      email: data.email,
+      username: data.username || 'Anônimo',
+      user_id: data.user_id
+    });
+    
+    // Atualizar métricas
+    metrics.activeConnections.set(usuariosConectados.size);
+    
+    // Notificar todos sobre nova conexão
+    io.emit('usuario_conectado', {
+      usuario: usuariosConectados.get(socket.id),
+      total_conectados: usuariosConectados.size
+    });
+    
+    logger.info('Total de usuários conectados', { total: usuariosConectados.size });
+  });
+  
+  // 11. Evento: Receber mensagem
+  socket.on('enviar_mensagem', (data) => {
+    // Criar mensagem com ID único
+    const mensagem = {
+      id: uuidv4(),
+      usuario_id: data.usuario_id,
+      email: data.email,
+      conteudo: data.conteudo,
+      timestamp: new Date().toISOString(),
+      tipo: data.tipo || 'publica'
+    };
+    
+    // Log de mensagem
+    logger.info('Mensagem recebida', { 
+               usuarioId: data.usuario_id, 
+               email: data.email,
+               tipo: data.tipo,
+               destinatarioId: data.destinatario_id 
+    });
+    
+    // Armazenar mensagem
+    mensagensArmazenadas.push(mensagem);
+    
+    // Se for mensagem privada, enviar apenas para o destinatário
+    if (data.tipo === 'privada' && data.destinatario_id) {
+      io.to(data.destinatario_id).emit('nova_mensagem', mensagem);
+    } else {
+      // Mensagem pública: enviar para todos
+      io.emit('nova_mensagem', mensagem);
+    }
+  });
+  
+  // 12. Evento: Notificação
+  socket.on('enviar_notificacao', (data) => {
+    const notificacao = {
+      id: uuidv4(),
+      usuario_id: data.usuario_id,
+      titulo: data.titulo,
+      conteudo: data.conteudo,
+      tipo: data.tipo || 'info',
+      timestamp: new Date().toISOString()
+    };
+    
+    // Log de notificação
+    logger.info('Notificação enviada', { 
+               usuarioId: data.usuario_id,
+               titulo: data.titulo,
+               tipo: data.tipo,
+               destinatarioId: data.destinatario_id 
+    });
+    
+    // Enviar notificação para um usuário específico
+    if (data.destinatario_id) {
+      io.to(data.destinatario_id).emit('nova_notificacao', notificacao);
+    } else {
+      // Broadcast para todos
+      io.emit('nova_notificacao', notificacao);
+    }
+  });
+  
+  // 13. Evento: Desconexão
+  socket.on('disconnect', () => {
+    const usuario = usuariosConectados.get(socket.id);
+    
+    if (usuario) {
+      logger.auth('logout', usuario.user_id, { email: usuario.email, socketId: socket.id });
+      usuariosConectados.delete(socket.id);
+      
+      // Atualizar métricas
+      metrics.activeConnections.set(usuariosConectados.size);
+      
+      logger.info('Total de usuários conectados', { total: usuariosConectados.size });
+      
+      // Notificar todos sobre desconexão
+      io.emit('usuario_desconectado', {
+        usuario_id: socket.id,
+        total_conectados: usuariosConectados.size
+      });
+    }
+  });
+  
+  // 14. Evento: Listar usuários conectados
+  socket.on('listar_usuarios', () => {
+    const usuarios = Array.from(usuariosConectados.values());
+    socket.emit('usuarios_conectados', usuarios);
+  });
+  
+  // 15. Evento: Status "digitando"
+  socket.on('usuario_digitando', (data) => {
+    socket.broadcast.emit('usuario_digitando_notificacao', {
+      usuario_id: data.usuario_id,
+      email: data.email
+    });
+  });
+});
+
+// 16. Iniciar servidor
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`=================================`);
+  console.log(`Servidor Node.js rodando na porta ${PORT}`);
+  console.log(`WebSocket: ws://localhost:${PORT}`);
+  console.log(`=================================`);
+});

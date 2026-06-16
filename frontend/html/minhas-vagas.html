@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Vagas - CurriculoHub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    /* Estilos da página de gerenciamento de vagas */
+    :root {
+      --primary: #764ba2;
+      --primary-2: #667eea;
+      --text-primary: #1a1a1a;
+      --text-secondary: #666;
+      --bg-light: #f4f7fc;
+      --border-color: #e2e8f0;
+      --card-radius: 12px;
+      --shadow-sm: 0 4px 6px rgba(0,0,0,0.05);
+    }
+    body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .btn-primary { background: var(--primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+    .btn-primary:hover { background: var(--primary-2); }
+    .vagas-lista { display: grid; gap: 1.5rem; }
+    .vaga-card { background: white; border-radius: var(--card-radius); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+    .vaga-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .vaga-card-titulo { font-size: 1.25rem; font-weight: 600; color: var(--text-primary); }
+    .vaga-card-info { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; }
+    .vaga-card-actions { display: flex; gap: 0.5rem; }
+    .btn-action { background: none; border: 1px solid var(--border-color); padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; }
+    
+    /* Modal */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: #fefefe; margin: 10% auto; padding: 2rem; border: 1px solid #888; width: 80%; max-width: 600px; border-radius: var(--card-radius); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .close-button { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">Portal Empresa</div>
+      <ul class="navbar-nav">
+        <li><a href="feed-empresa.html" class="nav-link">Início</a></li>
+        <li><a href="minhas-vagas.html" class="nav-link active">Vagas</a></li>
+      </ul>
+      <div class="user-menu">
+        <div id="userAvatar" class="user-avatar" style="border-radius: 8px;"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>Minhas Vagas</h1>
+      <button type="button" class="btn-primary" id="btnNovaVaga">Publicar Nova Vaga</button>
+    </div>
+
+    <div id="vagasLista" class="vagas-lista">
+      <!-- Vagas serão carregadas aqui -->
+      <p>Carregando vagas...</p>
+    </div>
+  </div>
+
+  <!-- Modal para Criar/Editar Vaga -->
+  <div id="vagaModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitulo">Nova Vaga</h2>
+        <span class="close-button">&times;</span>
+      </div>
+      <form id="vagaForm">
+        <input type="hidden" id="vagaId" name="vagaId">
+        <div class="form-group">
+          <label for="titulo">Título da Vaga</label>
+          <input type="text" id="titulo" name="titulo" required>
+        </div>
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" name="descricao" rows="5" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="localizacao">Localização</label>
+          <input type="text" id="localizacao" name="localizacao" required placeholder="Ex: Luanda ou Remoto">
+        </div>
+        <div class="form-group">
+          <label for="salario_min">Remuneração Mínima (opcional)</label>
+          <input type="number" id="salario_min" name="salario_min" placeholder="Ex: 3000">
+        </div>
+        <div class="form-group">
+          <label for="salario_max">Remuneração Máxima (opcional)</label>
+          <input type="number" id="salario_max" name="salario_max" placeholder="Ex: 7000">
+        </div>
+        <div class="form-group">
+          <label for="requisitos">Requisitos (separe por vírgula)</label>
+          <textarea id="requisitos" name="requisitos" rows="3" placeholder="Ex: Python, SQL, Linux"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="tipo_contrato">Tipo de Contrato</label>
+          <select id="tipo_contrato" name="tipo_contrato">
+            <option value="Permanente">Permanente</option>
+            <option value="Termo Certo">Termo Certo</option>
+            <option value="Termo Incerto">Termo Incerto</option>
+            <option value="Prestação de Serviços">Prestação de Serviços</option>
+            <option value="Estágio">Estágio</option>
+            <option value="Temporário">Temporário</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Salvar Vaga</button>
+      </form>
+    </div>
+  </div>
+
+    <!-- Modal de resultados da análise -->
+    <div id="screenModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="screenModalTitulo">Resultados da Análise</h2>
+          <span id="screenClose" class="close-button">&times;</span>
+        </div>
+        <div style="margin-bottom:1rem; display:flex; align-items:center; gap:8px;">
+          <label for="topK">Top K:</label>
+          <input type="number" id="topK" value="5" min="1" style="width:80px;">
+          <button id="btnMarkTop" class="btn-primary">Marcar Top K</button>
+        </div>
+        <div id="screenResults">
+          <p>Carregando resultados...</p>
+        </div>
+      </div>
+    </div>
+
+  <script src="api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('minhas-vagas.html carregado');
+
+      setTimeout(async () => {
+        if (typeof api === 'undefined') {
+          console.error('api não disponível');
+          return;
+        }
+
+        // verifica autenticação e tipo
+        redirectIfNotEmpresa();
+        const userData = api.userData || {};
+
+        // Elementos do DOM
+        const vagasListaEl = document.getElementById('vagasLista');
+        const btnNovaVaga = document.getElementById('btnNovaVaga');
+        const modal = document.getElementById('vagaModal');
+        const closeModalBtn = document.querySelector('.close-button');
+        const vagaForm = document.getElementById('vagaForm');
+        const modalTitulo = document.getElementById('modalTitulo');
+        const vagaIdInput = document.getElementById('vagaId');
+
+        // Funções
+        async function carregarVagas() {
+          try {
+            // solicitar já filtrando pelo ID da empresa (nos claims)
+            const empresaId = userData.empresa_id || userData.id;
+            console.log('carregarVagas: usando empresaId', empresaId, 'userData', userData);
+            const response = await api.listVagas(1, 100, empresaId);
+            console.log('carregarVagas response:', response);
+            const minhasVagas = response.vagas || [];
+
+            if (minhasVagas.length === 0) {
+              vagasListaEl.innerHTML = '<p style="color: #333; text-align: center;">Você ainda não publicou nenhuma vaga.</p>';
+              return [];
+            }
+
+            vagasListaEl.innerHTML = minhasVagas.map(vaga => `
+              <div class="vaga-card" data-vaga-id="${vaga.id}">
+                <div class="vaga-card-header">
+                  <div>
+                    <h3 class="vaga-card-titulo">${vaga.titulo}</h3>
+                    <p class="vaga-card-info">${vaga.localizacao} | ${vaga.tipo_contrato}</p>
+                  </div>
+                  <div class="vaga-card-actions">
+                    <button class="btn-action" data-id="${vaga.id}" onclick="editarVaga(${vaga.id})">Editar</button>
+                    <button class="btn-action" data-id="${vaga.id}" onclick="deletarVaga(${vaga.id})">Excluir</button>
+                    <button class="btn-action" data-id="${vaga.id}" onclick="analisarVaga(${vaga.id})">Analisar Candidatos</button>
+                  </div>
+                </div>
+                <p>${vaga.descricao.substring(0, 200)}...</p>
+              </div>
+            `).join('');
+            return minhasVagas;
+          } catch (error) {
+            console.error('Erro ao carregar vagas:', error);
+            vagasListaEl.innerHTML = '<p>Ocorreu um erro ao carregar suas vagas.</p>';
+            return [];
+          }
+        }
+
+        function abrirModal() { modal.style.display = 'block'; }
+        function fecharModal() { modal.style.display = 'none'; vagaForm.reset(); vagaIdInput.value = ''; modalTitulo.textContent = 'Nova Vaga'; }
+
+        btnNovaVaga.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('btnNovaVaga clicado — abrindo modal');
+          abrirModal();
+        });
+
+        closeModalBtn.addEventListener('click', fecharModal);
+        window.addEventListener('click', (event) => { if (event.target === modal) fecharModal(); });
+
+        vagaForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const formData = new FormData(vagaForm);
+          const dados = Object.fromEntries(formData.entries());
+          const vagaId = vagaIdInput.value;
+
+          try {
+            const titulo = dados.titulo;
+            const descricao = dados.descricao;
+            const requisitos = (dados.requisitos || '').split(',').map(r => r.trim()).filter(Boolean);
+            const tipoContrato = dados.tipo_contrato || 'Permanente';
+            const localizacao = dados.localizacao || '';
+            const salarioMin = parseFloat(dados.salario_min) || null;
+            const salarioMax = parseFloat(dados.salario_max) || null;
+
+            console.log('Enviando vaga:', { titulo, descricao, requisitos, tipoContrato, localizacao, salarioMin, salarioMax });
+
+            let apiResult;
+            if (vagaId) {
+              apiResult = await api.updateVaga(vagaId, { titulo, descricao, requisitos, tipo_contrato: tipoContrato, localizacao, salario_min: salarioMin, salario_max: salarioMax });
+            } else {
+              apiResult = await api.createVaga(titulo, descricao, requisitos, tipoContrato, localizacao, salarioMin, salarioMax);
+            }
+            console.log('Resultado da API vaga:', apiResult);
+
+            alert('Vaga salva com sucesso!');
+            fecharModal();
+            await carregarVagas();
+          } catch (error) {
+            console.error('Erro ao salvar vaga:', error);
+            alert('Erro ao salvar vaga. Veja console para detalhes.');
+          }
+        });
+
+        window.editarVaga = async function(id) {
+          try {
+            const vaga = await api.getVaga(id);
+            if (vaga) {
+              modalTitulo.textContent = 'Editar Vaga';
+              vagaIdInput.value = vaga.id;
+              document.getElementById('titulo').value = vaga.titulo || '';
+              document.getElementById('descricao').value = vaga.descricao || '';
+              document.getElementById('localizacao').value = vaga.localizacao || '';
+              document.getElementById('requisitos').value = (vaga.requisitos || []).join(', ');
+              document.getElementById('tipo_contrato').value = vaga.tipo_contrato || 'Permanente';
+              document.getElementById('salario_min').value = vaga.salario_min || '';
+              document.getElementById('salario_max').value = vaga.salario_max || '';
+              abrirModal();
+            }
+          } catch (error) {
+            alert('Erro ao carregar dados da vaga para edição: ' + error.message);
+          }
+        };
+
+        window.deletarVaga = async function(id) {
+          if (!confirm('Tem certeza que deseja excluir esta vaga?')) return;
+          try {
+            await api.updateVaga(id, { ativa: false });
+            alert('Vaga excluída com sucesso!');
+            await carregarVagas();
+          } catch (error) {
+            alert('Erro ao excluir vaga: ' + error.message);
+          }
+        };
+
+        // Função para analisar candidaturas de uma vaga
+        window.analisarVaga = async function(id) {
+          try {
+            document.getElementById('screenResults').innerHTML = '<p>Analisando candidatos com assistência...</p>';
+            const resp = await api.screenCandidates(id, 5, false);
+            const results = resp.results || [];
+            const container = document.getElementById('screenResults');
+            
+            if (!results.length) {
+              container.innerHTML = '<p style="text-align:center;color:#666;">Nenhuma candidatura encontrada para esta vaga.</p>';
+            } else {
+              container.innerHTML = results.map((r, idx) => `
+                <div style="padding:1.25rem; border-bottom:1px solid #eee; background:#fafafa;">
+                  <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:0.75rem;">
+                    <div>
+                      <strong style="font-size:1.05rem;">#${idx + 1} — ${r.candidato_nome || 'Candidato'}</strong>
+                      <div style="font-size:0.85rem; color:#666;">${r.candidato_email}</div>
+                    </div>
+                    <div style="text-align:right;">
+                      <div style="font-size:1.5rem; font-weight:bold; color:#764ba2;">${r.compatibilidade_pct}%</div>
+                      <div style="font-size:0.85rem; color:#555;">Compatibilidade</div>
+                    </div>
+                  </div>
+                  
+                  <div style="padding:0.75rem; background:#e8f4f8; border-radius:6px; margin-bottom:0.75rem;">
+                    <div style="font-weight:600; color:#0277bd; font-size:0.95rem;">${r.recomendacao}</div>
+                  </div>
+                  
+                  <div style="margin-bottom:0.75rem;">
+                    <div style="font-weight:600; font-size:0.9rem; color:#333; margin-bottom:0.35rem;">Pontos Fortes:</div>
+                    <div style="margin-left:0.5rem; font-size:0.85rem; color:#555;">
+                      ${r.pontos_fortes && r.pontos_fortes.length > 0 
+                        ? r.pontos_fortes.map(p => '<div>✓ ' + p + '</div>').join('')
+                        : '<div><em>Nenhum destaque</em></div>'}
+                    </div>
+                  </div>
+
+                  <div style="margin-bottom:0.75rem;">
+                    <div style="font-weight:600; font-size:0.9rem; color:#333; margin-bottom:0.35rem;">Pontos em Falta:</div>
+                    <div style="margin-left:0.5rem; font-size:0.85rem; color:#d32f2f;">
+                      ${r.pontos_falta && r.pontos_falta.length > 0 
+                        ? r.pontos_falta.map(f => '<div>✗ ' + f + '</div>').join('')
+                        : '<div><em>Todos os requisitos cobertos</em></div>'}
+                    </div>
+                  </div>
+
+                  <div style="font-size:0.85rem; color:#666;">
+                    <strong>Experiência:</strong> ${r.experiencia_anos} anos | 
+                    <strong>Formação:</strong> ${r.formacao && r.formacao.length > 0 ? r.formacao.join(', ') : 'Não informada'}
+                  </div>
+                </div>
+              `).join('');
+            }
+
+            // abrir modal de resultados
+            document.getElementById('screenModalTitulo').textContent = 'Análise de Candidatos - Vaga #' + id;
+            document.getElementById('screenModal').style.display = 'block';
+
+            // definir ação do botão marcar top K
+            document.getElementById('btnMarkTop').onclick = async function() {
+              const k = parseInt(document.getElementById('topK').value || '5');
+              try {
+                await api.screenCandidates(id, k, true);
+                alert('Top ' + k + ' candidatos marcados como "em análise". O gerente pode começar a revisar os perfis selecionados pela assistência.');
+                document.getElementById('screenModal').style.display = 'none';
+                await carregarVagas();
+              } catch (err) {
+                console.error(err);
+                alert('Erro ao marcar Top K. Veja console.');
+              }
+            };
+          } catch (error) {
+            console.error('Erro ao analisar candidaturas:', error);
+            alert('Erro ao analisar candidaturas. Verifique o console.');
+          }
+        };
+
+        // handlers do modal de análise
+        const screenCloseBtn = document.getElementById('screenClose');
+        if (screenCloseBtn) {
+          screenCloseBtn.addEventListener('click', () => { document.getElementById('screenModal').style.display = 'none'; });
+        }
+        window.addEventListener('click', (event) => { 
+          const screenModal = document.getElementById('screenModal');
+          if (event.target === screenModal) screenModal.style.display = 'none'; 
+        });
+
+        // Inicialização: preencher avatar e carregar vagas
+        document.getElementById('userAvatar').textContent = (api.userData.nome || api.userData.email || 'E')[0]?.toUpperCase() || 'E';
+        document.getElementById('userAvatar').addEventListener('click', () => { if (confirm('Deseja fazer logout?')) { api.logout(); window.location.href = 'login.html'; } });
+
+        const loaded = await carregarVagas();
+        // checar se precisamos auto-analisar (com retry caso o carregamento tarde)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('focus') === 'analyze') {
+          console.log('focus=analyze detectado, vagas carregadas count:', (loaded || []).length);
+          const tryAnalyze = async (attempt = 1) => {
+            const list = loaded && loaded.length ? loaded : await carregarVagas();
+            if (list && list.length > 0) {
+              console.log('Iniciando análise automática na vaga id=', list[0].id);
+              try { analisarVaga(list[0].id); } catch (e) { console.error('Erro ao iniciar analisarVaga:', e); }
+            } else if (attempt < 4) {
+              console.log('Nenhuma vaga ainda, tentando novamente (tentativa', attempt + 1 + ')');
+              setTimeout(() => tryAnalyze(attempt + 1), 350);
+            } else {
+              console.warn('Auto-analyze abortado: nenhuma vaga encontrada após tentativas');
+            }
+          };
+          tryAnalyze();
+        }
+      }, 200);
+    });
+  </script>
+</body>
+</html>

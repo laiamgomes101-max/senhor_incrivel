@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed da Empresa - CurriculoHub</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <style>
+    :root{
+      --primary: #764ba2; /* Roxo para empresa */
+      --primary-2: #667eea;
+      --text-primary:#1a1a1a;
+      --text-secondary:#666;
+      --bg-dark: linear-gradient(135deg, #24243e, #302b63, #0f0c29);
+    }
+
+    body{ font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; background: var(--bg-dark); min-height:100vh; }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 250px 1fr;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* Sidebar */
+    .sidebar-left { position: sticky; top: 70px; height: fit-content; }
+    .sidebar-card { background: white; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow-sm); }
+    .user-profile-card { text-align: center; }
+    .profile-header { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%); height: 60px; border-radius: 12px 12px 0 0; margin: -1.5rem -1.5rem 0 -1.5rem; }
+    .profile-avatar { width: 80px; height: 80px; border-radius: 12px; background: var(--primary-2); border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: -40px auto 1rem; font-weight: 600; color: white; }
+    .sidebar-link { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; color: var(--text-secondary); border-radius: 8px; transition: all 0.25s ease; cursor: pointer; margin-bottom: 0.5rem; text-decoration: none; }
+    .sidebar-link:hover { background: var(--bg-secondary); color: var(--primary); }
+    .sidebar-link.active { background: rgba(118, 75, 162, 0.1); color: var(--primary); font-weight: 600; }
+
+    /* Conteúdo Principal */
+    .main-content { background: white; border-radius: 12px; padding: 2rem; box-shadow: var(--shadow-sm); }
+    .section-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 8px; text-align: center; }
+    .stat-number { font-size: 2rem; font-weight: 700; color: var(--primary); }
+    .stat-label { color: var(--text-secondary); }
+
+    .action-card {
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      color: var(--text-secondary);
+    }
+    .action-card:hover {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    @media (max-width: 992px) {
+      .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+      .sidebar-left { position: static; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">Portal da Empresa</div>
+      <ul class="navbar-nav">
+        <li><a href="feed-empresa.html" class="nav-link active">Dashboard</a></li>
+        <li><a href="minhas-vagas.html" class="nav-link">Minhas Vagas</a></li>
+        <li><a href="#" class="nav-link">Candidatos</a></li>
+      </ul>
+      <div class="user-menu">
+        <div id="userAvatar" class="user-avatar" style="border-radius: 8px;"></div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-lg">
+    <div class="main-layout">
+      <!-- Sidebar Esquerda -->
+      <aside class="sidebar-left">
+        <div class="sidebar-card user-profile-card">
+          <div class="profile-header"></div>
+          <div id="companyLogo" class="profile-avatar"></div>
+          <h4 id="companyName" style="margin-bottom: 0.25rem;">Carregando...</h4>
+          <p style="margin: 0.5rem 0; color: var(--text-light); font-size: 0.875rem;">Conta Corporativa</p>
+          <a href="#" id="viewProfileBtn" style="color: var(--primary); font-weight: 600; text-decoration: none;">Ver perfil público →</a>
+        </div>
+
+        <div class="sidebar-card">
+          <a href="feed-empresa.html" class="sidebar-link active">Dashboard</a>
+          <a href="minhas-vagas.html" class="sidebar-link">Gerenciar Vagas</a>
+          <a href="#" class="sidebar-link">Buscar Candidatos</a>
+          <a href="config.html" class="sidebar-link">Configurações</a>
+        </div>
+      </aside>
+
+      <!-- Conteúdo Principal -->
+      <main class="main-content">
+        <h2 class="section-title" id="welcomeMessage">Bem-vinda, Empresa!</h2>
+
+        <!-- Estatísticas -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" id="statVagasAtivas">0</div>
+            <div class="stat-label">Vagas Ativas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statCandidaturas">0</div>
+            <div class="stat-label">Total de Candidaturas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="statNovasCandidaturas">0</div>
+            <div class="stat-label">Candidaturas (hoje)</div>
+          </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <h3 style="font-weight: 600; margin-bottom: 1rem;">Ações Rápidas</h3>
+        <div class="stats-grid">
+            <div class="action-card" onclick="window.location.href='minhas-vagas.html'">
+                <p style="font-size: 2rem;">➕</p>
+                <p style="font-weight: 600;">Publicar Nova Vaga</p>
+            </div>
+            <div class="action-card" onclick="window.location.href='minhas-vagas.html?focus=analyze'">
+                <p style="font-size: 2rem;">🧠</p>
+                <p style="font-weight: 600;">Analisar Candidatos</p>
+            </div>
+            <div class="action-card">
+                <p style="font-size: 2rem;">🔍</p>
+                <p style="font-weight: 600;">Buscar Candidatos</p>
+            </div>
+        </div>
+
+        <!-- Atividade Recente (Feed) -->
+        <h3 style="font-weight: 600; margin-top: 2rem; margin-bottom: 1rem;">Atividade Recente</h3>
+        <div id="feedPosts">
+            <p style="text-align: center; color: #666;">Carregando atividades...</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // Aguardar carregamento da página
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Feed Empresa: DOM Loaded');
+      
+      setTimeout(() => {
+        console.log('Feed Empresa: Iniciando, userData:', api.userData);
+        redirectIfNotEmpresa();
+        loadCompanyData();
+        loadCandidaturas();
+      }, 200);
+    });
+    async function loadCompanyData() {
+      try {
+        console.log('loadCompanyData iniciado, userData:', api.userData);
+        const userData = api.userData;
+        const nomeEmpresa = userData.nome || userData.email?.split('@')[0] || 'Empresa';
+        console.log('Nome empresa:', nomeEmpresa);
+        document.getElementById('companyName').textContent = nomeEmpresa;
+        document.getElementById('welcomeMessage').textContent = `Bem-vinda, ${nomeEmpresa}!`;
+
+      const initial = nomeEmpresa?.[0]?.toUpperCase() || 'E';
+      document.getElementById('companyLogo').textContent = initial;
+      document.getElementById('userAvatar').textContent = initial;
+      document.getElementById('userAvatar').style.cursor = 'pointer';
+      
+      document.getElementById('userAvatar').addEventListener('click', () => {
+        if (confirm('Deseja sair da sua conta?')) {
+          api.logout();
+          window.location.href = 'login.html';
+        }
+      });
+      console.log('loadCompanyData completado com sucesso');
+      } catch (error) {
+        console.error('Erro em loadCompanyData:', error);
+      }
+    }
+
+    // Carregar candidaturas
+    async function loadCandidaturas() {
+      try {
+        console.log('loadCandidaturas iniciado');
+        // Listar todas as vagas da empresa (usa empresa_id armazenado em userData)
+        const empresaId = api.userData.empresa_id || api.userData.id;
+        const vagasResponse = await api.listVagas(1, 100, empresaId);
+        console.log('Resposta de vagas:', vagasResponse);
+        const vagas = vagasResponse.vagas || [];
+        
+        // filtrar novamente por garantia
+        const minhasVagas = vagas.filter(v => v.empresa_id === empresaId);
+        let vagasCount = minhasVagas.length;
+        document.getElementById('statVagasAtivas').textContent = vagasCount;
+
+        // Montar feed de candidaturas
+        let feedHtml = '';
+        let candidaturasCount = 0;
+
+        if (vagas.length === 0) {
+          feedHtml = '<p style="text-align: center; color: #666;">Você ainda não publicou nenhuma vaga.</p>';
+        } else {
+          for (let vaga of vagas) {
+            feedHtml += `
+              <div class="card" style="margin-bottom: 1.5rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+                <h4 style="margin-bottom: 0.5rem;">${vaga.titulo}</h4>
+                <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #666;">Requisitos: ${(vaga.requisitos || []).join(', ') || 'Não especificados'}</p>
+                <p style="margin: 0.25rem 0; font-size: 0.9rem; color: #666;">${vaga.tipo_contrato || 'Tipo não especificado'} • ${vaga.localizacao || 'Local não especificado'}</p>
+                <small style="color: #999;">Criada em: ${new Date().toLocaleDateString()}</small>
+              </div>
+            `;
+            candidaturasCount++;
+          }
+        }
+
+        document.getElementById('statCandidaturas').textContent = candidaturasCount;
+        document.getElementById('statNovasCandidaturas').textContent = Math.max(0, candidaturasCount - 1);
+        document.getElementById('feedPosts').innerHTML = feedHtml || '<p style="text-align: center; color: #666;">Nenhuma vaga publicada ainda.</p>';
+      } catch (error) {
+        console.error('Erro ao carregar candidaturas:', error);
+        document.getElementById('feedPosts').innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar vagas.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
