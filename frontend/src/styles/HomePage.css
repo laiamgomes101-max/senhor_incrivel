@@ -134,6 +134,7 @@
   border-radius: 999px;
   font-weight: 600;
   transition: all 0.25s ease;
+  min-height: 48px;
 }
 
 .landing-link {
@@ -271,6 +272,16 @@
     justify-content: center;
   }
 
+  .landing-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .landing-actions .landing-link,
+  .landing-actions .landing-button {
+    width: 100%;
+  }
+
   .landing-main {
     padding-top: 1.5rem;
   }
@@ -278,6 +289,10 @@
   .landing-cta {
     flex-direction: column;
     gap: 0.85rem;
+  }
+
+  .landing-cta .btn {
+    width: 100%;
   }
 
   .landing-title {
