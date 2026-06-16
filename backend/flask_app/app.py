@@ -1,15 +1,8 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-from config import Config
-from extensions import db, migrate, jwt
-import os
-import logging
 from logging.config import dictConfig
+import os
 
-# Configuração de logs para arquivo e console
-# Usado para registrar eventos e erros da aplicação
-
-dictConfig({
+# Configuração base usando apenas a consola por segurança
+logging_config = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
@@ -18,13 +11,6 @@ dictConfig({
         },
     },
     'handlers': {
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': 'logs/app.log',
-            'maxBytes': 10485760,  
-            'backupCount': 5,
-            'formatter': 'standard',
-        },
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'standard',
@@ -32,8 +18,28 @@ dictConfig({
     },
     'root': {
         'level': 'INFO',
-        'handlers': ['console'] if os.getenv('FLASK_ENV') != 'development' else ['console', 'file'],
+        'handlers': ['console'],
     }
+}
+
+try:
+    # Tenta adicionar o handler de arquivo (útil para o teu ambiente local)
+    logging_config['handlers']['file'] = {
+        'class': 'logging.handlers.RotatingFileHandler',
+        'filename': 'logs/app.log',
+        'maxBytes': 10485760,
+        'backupCount': 5,
+        'formatter': 'standard',
+    }
+    # Se estiver local, ativa ambos os handlers
+    logging_config['root']['handlers'] = ['console', 'file']
+    dictConfig(logging_config)
+except Exception:
+    # Se falhar no Render por falta de permissão, remove o arquivo e força apenas a consola
+    if 'file' in logging_config['handlers']:
+        del logging_config['handlers']['file']
+    logging_config['root']['handlers'] = ['console']
+    dictConfig(logging_config)
 })
 
 logger = logging.getLogger(__name__)
