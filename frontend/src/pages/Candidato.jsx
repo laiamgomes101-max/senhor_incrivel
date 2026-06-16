@@ -9,7 +9,6 @@ import Tooltip from '../components/Tooltip'
 import ProgressIndicator from '../components/ProgressIndicator'
 import ProfileUpload from '../components/ProfileUpload'
 import AvailabilityStatus from '../components/AvailabilityStatus'
-import CertificatesManager from '../components/CertificatesManager'
 import './Candidato.css'
 
 export default function Candidato() {
@@ -65,8 +64,7 @@ export default function Candidato() {
               habilidades: [],
               idiomas: [],
               experiencia: [],
-              educacao: [],
-              certificados: []
+              educacao: []
             }
           })
           if (vagasRes) setVagas(vagasRes.data.vagas || [])
@@ -221,8 +219,7 @@ export default function Candidato() {
           habilidades: [],
           idiomas: [],
           experiencia: [],
-          educacao: [],
-          certificados: []
+          educacao: []
         }
       }))
     } catch (err) {
