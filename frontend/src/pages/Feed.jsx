@@ -2,7 +2,6 @@
 // Propósito: Mostrar posts, vagas e notificações do feed principal.
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
-import api from '../api/client'
 import flaskClient from '../api/flaskClient'
 // import { io } from 'socket.io-client' // TODO: Implementar socket.io no backend
 import './Feed.css'
@@ -89,26 +88,14 @@ export default function Feed() {
     loadFeed()
   }, [])
 
-  // fetch notifications (tries Node, then Flask fallback)
+  // fetch notifications (tries Flask)
   const fetchNotifications = async () => {
     if (!user) return
     try {
-      const { data } = await flaskClient.get('/api/posts-feed/notificacoes/nao-lidas')
+      const { data } = await flaskClient.get('/api/notificacoes?nao_lidas=true')
       setNotificacoes(data.notificacoes || [])
     } catch (err) {
-      console.warn('Falha posts-feed notificações, tentando fallback:', err.message || err)
-      try {
-        const { data } = await api.get('/notificacoes?nao_lidas=true')
-        setNotificacoes(data.data || data.notificacoes || [])
-      } catch (nodeErr) {
-        try {
-          const userId = user?.id || user?.user_id
-          const res = await flaskClient.get(`/api/notificacoes?nao_lidas=true`)
-          setNotificacoes(res.data.data || res.data.notificacoes || [])
-        } catch (err2) {
-          console.warn('Erro ao buscar notificações fallback final:', err2.message || err2)
-        }
-      }
+      console.warn('Erro ao buscar notificações:', err.message || err)
     }
   }
 

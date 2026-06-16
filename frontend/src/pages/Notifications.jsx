@@ -2,7 +2,7 @@
 // Propósito: Listar notificações do usuário.
 import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import api from '../api/client'
+import flaskClient from '../api/flaskClient'
 import './Notifications.css'
 
 export default function Notifications() {
@@ -19,9 +19,9 @@ export default function Notifications() {
       setLoading(true)
       setError(null)
       try {
-        const endpoint = filtro === 'nao_lidas' ? '/notificacoes?nao_lidas=true' : '/notificacoes'
-        const { data } = await api.get(endpoint)
-        setNotificacoes(data.data || [])
+        const endpoint = filtro === 'nao_lidas' ? '/api/notificacoes?nao_lidas=true' : '/api/notificacoes'
+        const { data } = await flaskClient.get(endpoint)
+        setNotificacoes(data.notificacoes || [])
       } catch (err) {
         setError('Não foi possível carregar as notificações.')
       } finally {

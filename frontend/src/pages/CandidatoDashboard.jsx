@@ -2,6 +2,7 @@
 // Propósito: Dashboard completo para candidatos com feed e notificações
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
+import flaskClient from '../api/flaskClient'
 import FeedPublico from '../components/FeedPublico'
 import NotificacoesFeed from '../components/NotificacoesFeed'
 import './CandidatoDashboard.css'
@@ -15,15 +16,8 @@ export default function CandidatoDashboard() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch('/api/notificacoes?nao_lidas=true', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        })
-        if (response.ok) {
-          const data = await response.json()
-          setUnreadCount((data.notificacoes || []).length)
-        }
+        const response = await flaskClient.get('/api/notificacoes?nao_lidas=true')
+        setUnreadCount((response.data.notificacoes || []).length)
       } catch (err) {
         console.error('Erro ao contar notificações:', err)
       }

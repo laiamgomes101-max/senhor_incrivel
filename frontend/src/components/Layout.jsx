@@ -1,7 +1,7 @@
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState, useEffect } from 'react'
-import api from '../api/client'
+import flaskClient from '../api/flaskClient'
 import './Layout.css'
 
 export default function Layout() {
@@ -34,7 +34,7 @@ export default function Layout() {
   useEffect(() => {
     let mounted = true
     if (!user) return
-    api.get('/notificacoes?nao_lidas=true').then(({ data }) => {
+    flaskClient.get('/api/notificacoes?nao_lidas=true').then(({ data }) => {
       if (!mounted) return
       const list = data.notificacoes || []
       setUnread(Array.isArray(list) ? list.length : 0)
