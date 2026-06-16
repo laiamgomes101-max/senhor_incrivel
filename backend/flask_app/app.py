@@ -27,7 +27,6 @@ db.init_app(app)
 migrate.init_app(app, db)
 jwt.init_app(app)
 
-
 # Configura origens permitidas para CORS com base em variáveis de ambiente
 cors_origins = [origin.strip() for origin in 
     os.getenv('ALLOWED_ORIGINS', '').split(',') if origin.strip()]
@@ -56,6 +55,10 @@ from routes.posts import posts_bp
 from routes.posts_simple import posts_simple_bp
 from routes.posts_feed import posts_feed_bp
 from routes.ia_service import ia_bp
+
+# Ensure database tables exist when running under Gunicorn / Render
+with app.app_context():
+    db.create_all()
 
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(curriculos_bp, url_prefix='/api/curriculos')
