@@ -1,46 +1,13 @@
-from logging.config import dictConfig
+import logging
 import os
+import sys
 
-# Configuração base usando apenas a consola por segurança
-logging_config = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
-        },
-    },
-    'root': {
-        'level': 'INFO',
-        'handlers': ['console'],
-    }
-}
-
-try:
-    # Tenta adicionar o handler de arquivo (útil para o teu ambiente local)
-    logging_config['handlers']['file'] = {
-        'class': 'logging.handlers.RotatingFileHandler',
-        'filename': 'logs/app.log',
-        'maxBytes': 10485760,
-        'backupCount': 5,
-        'formatter': 'standard',
-    }
-    # Se estiver local, ativa ambos os handlers
-    logging_config['root']['handlers'] = ['console', 'file']
-    dictConfig(logging_config)
-except Exception:
-    # Se falhar no Render por falta de permissão, remove o arquivo e força apenas a consola
-    if 'file' in logging_config['handlers']:
-        del logging_config['handlers']['file']
-    logging_config['root']['handlers'] = ['console']
-    dictConfig(logging_config)
-})
+# Configuração limpa e direta para produção e desenvolvimento
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(name)s: %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 logger = logging.getLogger(__name__)
 
