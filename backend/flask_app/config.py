@@ -61,6 +61,7 @@ class Config:
         lower_url = database_url.lower()
         if lower_url.startswith('mysql://') and 'pymysql' not in lower_url:
             database_url = 'mysql+pymysql://' + database_url[len('mysql://'):]
+        lower_url = database_url.lower()
         if lower_url.startswith('mysql+pymysql://'):
             database_url = normalize_mysql_url(database_url)
         SQLALCHEMY_DATABASE_URI = database_url
