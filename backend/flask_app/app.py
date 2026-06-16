@@ -1,6 +1,10 @@
 import logging
 import os
 import sys
+from flask import Flask, jsonify
+from config import Config
+from extensions import db, migrate, jwt
+from flask_cors import CORS
 
 # Configuração limpa e direta para produção e desenvolvimento
 logging.basicConfig(
