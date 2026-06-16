@@ -4,6 +4,8 @@ from extensions import db
 from models import Candidato, Curriculo
 import logging
 import json
+from sqlalchemy import text
+from sqlalchemy.exc import OperationalError
 
 logger = logging.getLogger(__name__)
 MAX_BASE64_IMAGE_LENGTH = 1000000
@@ -65,29 +67,53 @@ def meu_perfil():
                 'id': candidato.id, 'nome': candidato.nome, 'headline': candidato.headline,
                 'localizacao': candidato.localizacao, 'sobre': candidato.sobre, 'foto_url': candidato.foto_url
             }
-            logger.info(f"GET: Dados básicos preparados. Currículo existe? {candidato.curriculo is not None}")
-            
-            if candidato.curriculo:
-                logger.info(f"GET: Preparando currí culo")
-                data['curriculo'] = {
-                    'id': candidato.curriculo.id,
-                    'experiencia': safe_json_value(candidato.curriculo.experiencia),
-                    'educacao': safe_json_value(candidato.curriculo.educacao),
-                    'habilidades': safe_json_value(candidato.curriculo.habilidades),
-                    'idiomas': safe_json_value(candidato.curriculo.idiomas),
-                    'certificados': safe_json_value(candidato.curriculo.certificados),
-                    'arquivo_url': candidato.curriculo.arquivo_url
-                }
-                logger.info(f"GET: Currículo preparado")
-            
+
+            # Tentar acessar o relacionamento curriculo de forma segura.
+            try:
+                curr = candidato.curriculo
+            except OperationalError as op_err:
+                # Se a coluna 'certificados' não existir no DB, fazer fallback para uma consulta manual
+                logger.warning(f"OperationalError ao acessar curriculo (fallback): {op_err}")
+                qry = text("SELECT id, experiencia, educacao, habilidades, idiomas, arquivo_url FROM curriculos WHERE candidato_id = :cid LIMIT 1")
+                row = db.session.execute(qry, {'cid': candidato_id}).fetchone()
+                if row:
+                    data['curriculo'] = {
+                        'id': row['id'],
+                        'experiencia': safe_json_value(row['experiencia']),
+                        'educacao': safe_json_value(row['educacao']),
+                        'habilidades': safe_json_value(row['habilidades']),
+                        'idiomas': safe_json_value(row['idiomas']),
+                        'arquivo_url': row['arquivo_url']
+                    }
+                else:
+                    data['curriculo'] = None
+            else:
+                # Acesso normal quando não houve erro operacional
+                if curr:
+                    data['curriculo'] = {
+                        'id': curr.id,
+                        'experiencia': safe_json_value(curr.experiencia),
+                        'educacao': safe_json_value(curr.educacao),
+                        'habilidades': safe_json_value(curr.habilidades),
+                        'idiomas': safe_json_value(curr.idiomas),
+                        # usar getattr para evitar erro se coluna não existir no banco
+                        'certificados': safe_json_value(getattr(curr, 'certificados', None)),
+                        'arquivo_url': curr.arquivo_url
+                    }
+                else:
+                    data['curriculo'] = None
+
             logger.info(f"GET /api/candidatos/me retornado com sucesso para candidato {candidato_id}")
             return jsonify(data)
         except TypeError as e:
             logger.error(f"GET: Erro de tipo (JSON não-serializável): {e}")
             logger.error(f"  Candidato.nome: {type(candidato.nome)} = {candidato.nome}")
-            if candidato.curriculo:
-                logger.error(f"  Currículo.experiencia: {type(candidato.curriculo.experiencia)}")
-                logger.error(f"  Currículo.habilidades: {type(candidato.curriculo.habilidades)}")
+            try:
+                if candidato.curriculo:
+                    logger.error(f"  Currículo.experiencia: {type(candidato.curriculo.experiencia)}")
+                    logger.error(f"  Currículo.habilidades: {type(candidato.curriculo.habilidades)}")
+            except Exception:
+                logger.exception("Erro ao inspecionar curriculo durante tratamento de erro")
             import traceback
             logger.error(f"Traceback: {traceback.format_exc()}")
             return jsonify({'error': 'Erro ao serializar perfil (tipo de dado inválido)'}), 500
@@ -123,8 +149,19 @@ def meu_perfil():
                 db.session.add(curriculo)
                 db.session.flush()
                 candidato.curriculo = curriculo
+
+            # Verificar colunas reais da tabela 'curriculos' para evitar atribuir colunas inexistentes
+            try:
+                inspector = db.inspect(db.engine)
+                curr_cols = [c['name'] for c in inspector.get_columns('curriculos')] if 'curriculos' in inspector.get_table_names() else []
+            except Exception:
+                curr_cols = []
             for field in ['experiencia', 'educacao', 'habilidades', 'idiomas', 'certificados']:
                 if field in cur:
+                    # Só atribuir se a coluna existir no banco ou se não conseguirmos inspecionar (conservador)
+                    if curr_cols and field not in curr_cols:
+                        logger.warning(f"PUT: coluna '{field}' não existe no DB; pulando atribuição")
+                        continue
                     value = cur[field]
                     if not isinstance(value, (list, dict, type(None))):
                         logger.warning(f"PUT: Campo {field} esperava list/dict, recebido {type(value)}")
