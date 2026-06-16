@@ -13,6 +13,9 @@ candidatos_bp = Blueprint('candidatos', __name__)
 @candidatos_bp.route('/me', methods=['GET', 'PUT'])
 @jwt_required()
 def meu_perfil():
+    auth_header_present = bool(request.headers.get('Authorization'))
+    logger.info(f"Request /api/candidatos/me method={request.method} auth_present={auth_header_present}")
+
     claims = get_jwt()
     if claims.get('tipo') != 'candidato':
         return jsonify({'error': 'Acesso negado'}), 403
@@ -38,6 +41,8 @@ def meu_perfil():
 
     data = request.get_json(silent=True) or {}
     logger.info(f"PUT /api/candidatos/me payload keys: {list(data.keys()) if data else None}")
+    if data:
+        logger.debug(f"PUT /api/candidatos/me payload: {data if len(str(data)) < 1000 else 'payload too large to log'}")
 
     if 'foto_url' in data and isinstance(data['foto_url'], str) and len(data['foto_url']) > MAX_BASE64_IMAGE_LENGTH:
         logger.warning('Foto de perfil excede o tamanho máximo permitido')
