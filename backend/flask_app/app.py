@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import sys
 from flask import Flask, jsonify
 from config import Config
@@ -17,6 +18,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
+# Aceita rotas com ou sem barra final para evitar redirects em preflight CORS
+app.url_map.strict_slashes = False
+
 # Carrega as configurações da classe Config
 app.config.from_object(Config)
 
@@ -33,14 +37,26 @@ cors_origins = [origin.strip() for origin in
 if not cors_origins:
     cors_origins = [
         'http://localhost:5173',
-        'https://senhor-incrivel.vercel.app'
+        'https://senhor-incrivel.vercel.app',
+        'https://apwemi.vercel.app'
     ]
 
-# Configure CORS using `ALLOWED_ORIGINS` (comma-separated) or defaults.
-# In production, set the Render env var `ALLOWED_ORIGINS` to the frontend origin(s)
-# e.g. `https://apwemi.vercel.app,https://senhor-incrivel.vercel.app`
+# Permit dynamic Vercel subdomains via regex if ALLOWED_ORIGINS is unset
+# Render / Flask-CORS não aceita wildcard em hostnames, então usamos uma função customizada
+if os.getenv('ALLOWED_ORIGINS'):
+    cors_args = {'origins': cors_origins}
+else:
+    cors_args = {
+        'origins': [
+            re.compile(r'^https:\/\/(?:[a-z0-9-]+\.)?vercel\.app$'),
+            'http://localhost:5173',
+            'https://senhor-incrivel.vercel.app',
+            'https://apwemi.vercel.app'
+        ]
+    }
+
 CORS(app,
-    resources={r"/api/*": {"origins": cors_origins}},
+    resources={r"/api/*": cors_args},
     supports_credentials=False
 )
 
