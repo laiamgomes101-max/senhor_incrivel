@@ -9,6 +9,7 @@ import Tooltip from '../components/Tooltip'
 import ProgressIndicator from '../components/ProgressIndicator'
 import ProfileUpload from '../components/ProfileUpload'
 import AvailabilityStatus from '../components/AvailabilityStatus'
+import CertificatesManager from '../components/CertificatesManager'
 import './Candidato.css'
 
 export default function Candidato() {
@@ -27,7 +28,7 @@ export default function Candidato() {
   const [saving, setSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [saveError, setSaveError] = useState('')
-  const [form, setForm] = useState({
+  const initialForm = {
     nome: '',
     headline: '',
     localizacao: '',
@@ -39,11 +40,10 @@ export default function Candidato() {
       idiomas: [],
       experiencia: [],
       educacao: []
-    (candidato.curriculo.habilidades?.length > 0) ||
-    (candidato.curriculo.idiomas?.length > 0) ||
-    (candidato.curriculo.experiencia?.length > 0) ||
-    (candidato.curriculo.educacao?.length > 0)
-  )
+    }
+  };
+
+  const [form, setForm] = useState(initialForm);
 
   useEffect(() => {
     if (souEu || id) {
@@ -64,7 +64,8 @@ export default function Candidato() {
               habilidades: [],
               idiomas: [],
               experiencia: [],
-              educacao: []
+              educacao: [],
+              certificados: []
             }
           })
           if (vagasRes) setVagas(vagasRes.data.vagas || [])
@@ -219,7 +220,8 @@ export default function Candidato() {
           habilidades: [],
           idiomas: [],
           experiencia: [],
-          educacao: []
+          educacao: [],
+          certificados: []
         }
       }))
     } catch (err) {
