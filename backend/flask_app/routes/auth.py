@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+import logging
 
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_jwt
 
@@ -8,7 +9,7 @@ from extensions import db
 
 from models import User, Candidato, Empresa
 
-
+logger = logging.getLogger(__name__)
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -17,100 +18,106 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register/candidato', methods=['POST'])
 
 def register_candidato():
+    try:
+        data = request.get_json()
 
-    data = request.get_json()
+        if not data or not data.get('email') or not data.get('password'):
 
-    if not data or not data.get('email') or not data.get('password'):
-
-        return jsonify({'error': 'Email e senha são obrigatórios'}), 400
-
-
-
-    if db.session.execute(db.select(User).where(User.email == data['email'])).scalar_one_or_none():
-
-        return jsonify({'error': 'Email já cadastrado'}), 409
+            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
 
 
 
-    user = User(email=data['email'], tipo='candidato')
+        if db.session.execute(db.select(User).where(User.email == data['email'])).scalar_one_or_none():
 
-    user.set_password(data['password'])
-
-    db.session.add(user)
-
-    db.session.commit()
+            return jsonify({'error': 'Email já cadastrado'}), 409
 
 
 
-    candidato = Candidato(user_id=user.id, nome=data.get('nome', 'Candidato'))
+        user = User(email=data['email'], tipo='candidato')
 
-    db.session.add(candidato)
+        user.set_password(data['password'])
 
-    db.session.commit()
+        db.session.add(user)
+
+        db.session.commit()
 
 
 
-    token = create_access_token(identity=str(user.id), additional_claims={'tipo': 'candidato', 'candidato_id': candidato.id})
+        candidato = Candidato(user_id=user.id, nome=data.get('nome', 'Candidato'))
 
-    return jsonify({
+        db.session.add(candidato)
 
-        'token': token,
+        db.session.commit()
 
-        'user': {'id': user.id, 'email': user.email, 'tipo': 'candidato'},
 
-        'candidato': {'id': candidato.id, 'nome': candidato.nome}
 
-    }), 201
+        token = create_access_token(identity=str(user.id), additional_claims={'tipo': 'candidato', 'candidato_id': candidato.id})
+
+        return jsonify({
+
+            'token': token,
+
+            'user': {'id': user.id, 'email': user.email, 'tipo': 'candidato'},
+
+            'candidato': {'id': candidato.id, 'nome': candidato.nome}
+
+        }), 201
+    except Exception as e:
+        logger.error(f'Erro ao registar candidato: {str(e)}', exc_info=True)
+        raise
 
 
 
 @auth_bp.route('/register/empresa', methods=['POST'])
 
 def register_empresa():
+    try:
+        data = request.get_json()
 
-    data = request.get_json()
+        if not data or not data.get('email') or not data.get('password'):
 
-    if not data or not data.get('email') or not data.get('password'):
-
-        return jsonify({'error': 'Email e senha são obrigatórios'}), 400
-
-
-
-    if db.session.execute(db.select(User).where(User.email == data['email'])).scalar_one_or_none():
-
-        return jsonify({'error': 'Email já cadastrado'}), 409
+            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
 
 
 
-    user = User(email=data['email'], tipo='empresa')
+        if db.session.execute(db.select(User).where(User.email == data['email'])).scalar_one_or_none():
 
-    user.set_password(data['password'])
-
-    db.session.add(user)
-
-    db.session.commit()
+            return jsonify({'error': 'Email já cadastrado'}), 409
 
 
 
-    empresa = Empresa(user_id=user.id, nome=data.get('nome', 'Empresa'))
+        user = User(email=data['email'], tipo='empresa')
 
-    db.session.add(empresa)
+        user.set_password(data['password'])
 
-    db.session.commit()
+        db.session.add(user)
+
+        db.session.commit()
 
 
 
-    token = create_access_token(identity=str(user.id), additional_claims={'tipo': 'empresa', 'empresa_id': empresa.id})
+        empresa = Empresa(user_id=user.id, nome=data.get('nome', 'Empresa'))
 
-    return jsonify({
+        db.session.add(empresa)
 
-        'token': token,
+        db.session.commit()
 
-        'user': {'id': user.id, 'email': user.email, 'tipo': 'empresa'},
 
-        'empresa': {'id': empresa.id, 'nome': empresa.nome}
 
-    }), 201
+        token = create_access_token(identity=str(user.id), additional_claims={'tipo': 'empresa', 'empresa_id': empresa.id})
+
+        return jsonify({
+
+            'token': token,
+
+            'user': {'id': user.id, 'email': user.email, 'tipo': 'empresa'},
+
+            'empresa': {'id': empresa.id, 'nome': empresa.nome}
+
+        }), 201
+    except Exception as e:
+        logger.error(f'Erro ao registar empresa: {str(e)}', exc_info=True)
+        raise
 
 
 
