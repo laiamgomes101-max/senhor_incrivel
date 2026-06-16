@@ -71,6 +71,7 @@ from routes.posts import posts_bp
 from routes.posts_simple import posts_simple_bp
 from routes.posts_feed import posts_feed_bp
 from routes.ia_service import ia_bp
+from routes.diagnostico import diag_bp
 
 # Ensure database tables exist when running under Gunicorn / Render
 with app.app_context():
@@ -86,6 +87,7 @@ app.register_blueprint(posts_bp, url_prefix='/api/posts')
 app.register_blueprint(posts_simple_bp, url_prefix='/api/posts-simple')
 app.register_blueprint(posts_feed_bp, url_prefix='/api/posts-feed')
 app.register_blueprint(ia_bp, url_prefix='/api/ia')
+app.register_blueprint(diag_bp, url_prefix='/api/diagnostico')
 
 
 from utils.errors import BusinessError

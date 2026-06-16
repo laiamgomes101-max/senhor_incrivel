@@ -29,10 +29,18 @@ def safe_json_value(value):
 @jwt_required()
 def meu_perfil():
     auth_header_present = bool(request.headers.get('Authorization'))
-    logger.info(f"Request /api/candidatos/me method={request.method} auth_present={auth_header_present}")
+    logger.info(f"===== REQUEST /api/candidatos/me =====")
+    logger.info(f"Method: {request.method}, Auth present: {auth_header_present}")
 
-    claims = get_jwt()
+    try:
+        claims = get_jwt()
+        logger.info(f"JWT Claims - tipo: {claims.get('tipo')}, candidato_id: {claims.get('candidato_id')}")
+    except Exception as e:
+        logger.exception(f"Erro ao extrair JWT claims: {e}")
+        return jsonify({'error': 'Token inválido'}), 401
+
     if claims.get('tipo') != 'candidato':
+        logger.warning(f"Acesso negado: tipo não é 'candidato' mas '{claims.get('tipo')}'")
         return jsonify({'error': 'Acesso negado'}), 403
 
     candidato_id = claims.get('candidato_id')
@@ -41,18 +49,26 @@ def meu_perfil():
         return jsonify({'error': 'Token inválido'}), 401
 
     try:
+        logger.info(f"Buscando candidato com ID: {candidato_id}")
         candidato = db.get_or_404(Candidato, candidato_id)
+        logger.info(f"Candidato encontrado: {candidato.nome}")
     except Exception as e:
-        logger.error(f"Erro ao carregar candidato {candidato_id}: {str(e)}")
+        logger.error(f"Erro ao carregar candidato {candidato_id}: {type(e).__name__}: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({'error': 'Candidato não encontrado'}), 404
 
     if request.method == 'GET':
         try:
+            logger.info(f"GET: Preparando dados do candidato {candidato_id}")
             data = {
                 'id': candidato.id, 'nome': candidato.nome, 'headline': candidato.headline,
                 'localizacao': candidato.localizacao, 'sobre': candidato.sobre, 'foto_url': candidato.foto_url
             }
+            logger.info(f"GET: Dados básicos preparados. Currículo existe? {candidato.curriculo is not None}")
+            
             if candidato.curriculo:
+                logger.info(f"GET: Preparando currí culo")
                 data['curriculo'] = {
                     'id': candidato.curriculo.id,
                     'experiencia': safe_json_value(candidato.curriculo.experiencia),
@@ -62,19 +78,30 @@ def meu_perfil():
                     'certificados': safe_json_value(candidato.curriculo.certificados),
                     'arquivo_url': candidato.curriculo.arquivo_url
                 }
+                logger.info(f"GET: Currículo preparado")
+            
             logger.info(f"GET /api/candidatos/me retornado com sucesso para candidato {candidato_id}")
             return jsonify(data)
+        except TypeError as e:
+            logger.error(f"GET: Erro de tipo (JSON não-serializável): {e}")
+            logger.error(f"  Candidato.nome: {type(candidato.nome)} = {candidato.nome}")
+            if candidato.curriculo:
+                logger.error(f"  Currículo.experiencia: {type(candidato.curriculo.experiencia)}")
+                logger.error(f"  Currículo.habilidades: {type(candidato.curriculo.habilidades)}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return jsonify({'error': 'Erro ao serializar perfil (tipo de dado inválido)'}), 500
         except Exception as e:
-            logger.exception(f'Erro ao serializar GET /candidatos/me: {str(e)}')
-            return jsonify({'error': 'Erro ao carregar perfil'}), 500
+            logger.exception(f'GET: Erro ao serializar /candidatos/me: {str(e)}')
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return jsonify({'error': f'Erro ao carregar perfil: {str(e)[:100]}'}), 500
 
     # PUT
     try:
         data = request.get_json(silent=True) or {}
-        logger.info(f"PUT /api/candidatos/me payload keys: {list(data.keys()) if data else None}")
-        if data:
-            logger.debug(f"PUT /api/candidatos/me payload: {data if len(str(data)) < 1000 else 'payload too large to log'}")
-
+        logger.info(f"PUT /api/candidatos/me - payload keys: {list(data.keys())}")
+        
         if 'foto_url' in data and isinstance(data['foto_url'], str) and len(data['foto_url']) > MAX_BASE64_IMAGE_LENGTH:
             logger.warning('Foto de perfil excede o tamanho máximo permitido')
             return jsonify({'error': 'A imagem é muito grande. Envie uma foto menor ou de menor qualidade.'}), 413
@@ -82,16 +109,17 @@ def meu_perfil():
         for field in ['nome', 'headline', 'localizacao', 'sobre', 'foto_url']:
             if field in data:
                 value = data[field]
-                logger.debug(f"Atualizando campo {field}: {type(value).__name__}, len={len(str(value)) if value else 0}")
                 setattr(candidato, field, value)
+                logger.debug(f"PUT: Campo {field} atualizado")
 
         if 'curriculo' in data:
             cur = data['curriculo']
             if not isinstance(cur, dict):
-                logger.error(f"Campo curriculo deve ser dict, recebido {type(cur)}")
+                logger.error(f"PUT: Campo curriculo deve ser dict, recebido {type(cur)}")
                 return jsonify({'error': 'Campo curriculo inválido'}), 400
             if not candidato.curriculo:
-                curriculo = Curriculo(candidato_id=candidato.id)
+                logger.info(f"PUT: Criando novo currículo para candidato {candidato_id}")
+                curriculo = Curriculo(candidato_id=candidato_id)
                 db.session.add(curriculo)
                 db.session.flush()
                 candidato.curriculo = curriculo
@@ -99,19 +127,21 @@ def meu_perfil():
                 if field in cur:
                     value = cur[field]
                     if not isinstance(value, (list, dict, type(None))):
-                        logger.warning(f"Campo {field} esperava list/dict, recebido {type(value)}")
+                        logger.warning(f"PUT: Campo {field} esperava list/dict, recebido {type(value)}")
                         value = safe_json_value(value)
                     setattr(candidato.curriculo, field, value)
+                    logger.debug(f"PUT: Currículo.{field} atualizado")
 
+        logger.info(f"PUT: Commitando mudanças do candidato {candidato_id}")
         db.session.commit()
-        logger.info(f"Perfil de candidato {candidato_id} atualizado com sucesso")
+        logger.info(f"PUT: Perfil de candidato {candidato_id} atualizado com sucesso")
         return jsonify({'message': 'Perfil atualizado'})
     except Exception as err:
-        logger.exception(f'Erro ao atualizar perfil do candidato {candidato_id}: {type(err).__name__}: {str(err)}')
+        logger.exception(f'PUT: Erro ao atualizar perfil do candidato {candidato_id}: {type(err).__name__}: {str(err)}')
         db.session.rollback()
         import traceback
         tb = traceback.format_exc()
-        logger.error(f"Stack trace: {tb}")
+        logger.error(f"PUT: Stack trace:\n{tb}")
         return jsonify({'error': f'Erro ao atualizar perfil: {str(err)[:100]}'}), 500
 
 @candidatos_bp.route('/', methods=['GET'])
