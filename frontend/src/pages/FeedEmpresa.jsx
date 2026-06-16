@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 import flaskClient from '../api/flaskClient'
-import { io } from 'socket.io-client'
+// import { io } from 'socket.io-client' // TODO: Implementar socket.io no backend
 import ChatIA from './ChatIA'
 import './Feed.css'
 
@@ -77,31 +77,31 @@ export default function FeedEmpresa() {
 
   const candidatePosts = posts.filter((post) => post.autor?.tipo === 'candidato')
 
-  // Socket.io - atualizações em tempo real
-  useEffect(() => {
-    if (!token || !empresa?.id) return
-    
-    const socket = io(SOCKET_URL)
-    socket.on('connect', () => {
-      if (empresa?.id) socket.emit('autenticar', empresa.id)
-    })
-    
-    socket.on('nova_vaga', (vaga) => {
-      setVagas(prev => [vaga, ...prev])
-    })
-    
-    socket.on('nova_candidatura', (candidatura) => {
-      setCandidaturas(prev => [candidatura, ...prev])
-    })
+  // TODO: Implementar socket.io no backend para real-time updates
+  // useEffect(() => {
+  //   if (!token || !empresa?.id) return
+  //   
+  //   const socket = io(SOCKET_URL)
+  //   socket.on('connect', () => {
+  //     if (empresa?.id) socket.emit('autenticar', empresa.id)
+  //   })
+  //   
+  //   socket.on('nova_vaga', (vaga) => {
+  //     setVagas(prev => [vaga, ...prev])
+  //   })
+  //   
+  //   socket.on('nova_candidatura', (candidatura) => {
+  //     setCandidaturas(prev => [candidatura, ...prev])
+  //   })
 
-    socket.on('feed_atualizado', (post) => {
-      if (post?.autor?.tipo === 'candidato') {
-        setPosts(prev => [post, ...prev])
-      }
-    })
-    
-    return () => socket.disconnect()
-  }, [token, empresa?.id])
+  //   socket.on('feed_atualizado', (post) => {
+  //     if (post?.autor?.tipo === 'candidato') {
+  //       setPosts(prev => [post, ...prev])
+  //     }
+  //   })
+  //   
+  //   return () => socket.disconnect()
+  // }, [token, empresa?.id])
 
   const atualizarStatusCandidatura = async (candidaturaId, novoStatus) => {
     try {

@@ -19,7 +19,7 @@ export default function Notifications() {
       setLoading(true)
       setError(null)
       try {
-        const endpoint = filtro === 'nao_lidas' ? '/notificacoes/unread' : '/notificacoes'
+        const endpoint = filtro === 'nao_lidas' ? '/notificacoes?nao_lidas=true' : '/notificacoes'
         const { data } = await api.get(endpoint)
         setNotificacoes(data.data || [])
       } catch (err) {

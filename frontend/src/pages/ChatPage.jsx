@@ -1,7 +1,7 @@
 // Página: ChatPage
 // Propósito: Interface de chat em tempo real entre usuários.
 import { useEffect, useMemo, useState } from 'react';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client'; // TODO: Implementar socket.io no backend
 import { useAuth } from '../context/AuthContext';
 import CurriculoAnalysisPanel from '../components/CurriculoAnalysisPanel';
 import {
@@ -25,50 +25,51 @@ export default function ChatPage() {
   const role = empresa ? 'empresa' : candidato ? 'candidato' : null;
   const userId = empresa?.id || candidato?.id;
 
-  const socket = useMemo(
-    () => io(SOCKET_URL, {
-      autoConnect: false,
-      transports: ['websocket']
-    }),
-    []
-  );
+  // TODO: Implementar socket.io no backend para real-time chat
+  // const socket = useMemo(
+  //   () => io(SOCKET_URL, {
+  //     autoConnect: false,
+  //     transports: ['websocket']
+  //   }),
+  //   []
+  // );
 
-  useEffect(() => {
-    if (!role || !userId) return;
+  // useEffect(() => {
+  //   if (!role || !userId) return;
 
-    socket.connect();
-    socket.emit('join:user', userId);
+  //   socket.connect();
+  //   socket.emit('join:user', userId);
 
-    socket.on('connect', () => {
-      setStatusMessage('Conectado ao chat em tempo real');
-    });
+  //   socket.on('connect', () => {
+  //     setStatusMessage('Conectado ao chat em tempo real');
+  //   });
 
-    socket.on('new_message', (message) => {
-      if (String(message.chat_room_id) === String(activeRoom?.id)) {
-        setMessages((prev) => [...prev, message]);
-      }
-      setRooms((prevRooms) =>
-        prevRooms.map((room) =>
-          String(room.id) === String(message.chat_room_id)
-            ? { ...room, ultimaMensagem: message, unread_count: room.unread_count + 1 }
-            : room
-        )
-      );
-    });
+  //   socket.on('new_message', (message) => {
+  //     if (String(message.chat_room_id) === String(activeRoom?.id)) {
+  //       setMessages((prev) => [...prev, message]);
+  //     }
+  //     setRooms((prevRooms) =>
+  //       prevRooms.map((room) =>
+  //         String(room.id) === String(message.chat_room_id)
+  //           ? { ...room, ultimaMensagem: message, unread_count: room.unread_count + 1 }
+  //           : room
+  //       )
+  //     );
+  //   });
 
-    socket.on('messages_read', ({ roomId }) => {
-      setRooms((prev) =>
-        prev.map((room) =>
-          String(room.id) === String(roomId) ? { ...room, unread_count: 0 } : room
-        )
-      );
-    });
+  //   socket.on('messages_read', ({ roomId }) => {
+  //     setRooms((prev) =>
+  //       prev.map((room) =>
+  //         String(room.id) === String(roomId) ? { ...room, unread_count: 0 } : room
+  //       )
+  //     );
+  //   });
 
-    return () => {
-      socket.disconnect();
-      socket.off();
-    };
-  }, [role, userId, socket, activeRoom]);
+  //   return () => {
+  //     socket.disconnect();
+  //     socket.off();
+  //   };
+  // }, [role, userId, socket, activeRoom]);
 
   useEffect(() => {
     if (!role || !userId) return;
@@ -88,7 +89,7 @@ export default function ChatPage() {
   const openRoom = async (room) => {
     setActiveRoom(room);
     setCandidaturaData(null);
-    socket.emit('join_room', { roomId: room.id, userId });
+    // socket.emit('join_room', { roomId: room.id, userId }); // TODO: Implementar socket.io no backend
 
     try {
       const response = await fetchChatMessages(room.id);
@@ -139,7 +140,7 @@ export default function ChatPage() {
       const response = await sendChatMessage(activeRoom.id, payload);
       const message = response.data.data;
       setMessages((prev) => [...prev, message]);
-      socket.emit('chat_message', { roomId: activeRoom.id, ...payload });
+      // socket.emit('chat_message', { roomId: activeRoom.id, ...payload }); // TODO: Implementar socket.io no backend
       setDraft('');
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);

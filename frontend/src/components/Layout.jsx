@@ -34,9 +34,9 @@ export default function Layout() {
   useEffect(() => {
     let mounted = true
     if (!user) return
-    api.get('/notificacoes/unread').then(({ data }) => {
+    api.get('/notificacoes?nao_lidas=true').then(({ data }) => {
       if (!mounted) return
-      const list = data.data || []
+      const list = data.notificacoes || []
       setUnread(Array.isArray(list) ? list.length : 0)
     }).catch(() => {})
     return () => { mounted = false }

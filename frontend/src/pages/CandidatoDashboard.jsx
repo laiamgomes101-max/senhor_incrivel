@@ -15,7 +15,7 @@ export default function CandidatoDashboard() {
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const response = await fetch('/api/notificacoes/unread', {
+        const response = await fetch('/api/notificacoes?nao_lidas=true', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }

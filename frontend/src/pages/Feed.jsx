@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 import flaskClient from '../api/flaskClient'
-import { io } from 'socket.io-client'
+// import { io } from 'socket.io-client' // TODO: Implementar socket.io no backend
 import './Feed.css'
 import './FeedExtras.css'
 
@@ -98,12 +98,12 @@ export default function Feed() {
     } catch (err) {
       console.warn('Falha posts-feed notificações, tentando fallback:', err.message || err)
       try {
-        const { data } = await api.get('/notificacoes/unread')
+        const { data } = await api.get('/notificacoes?nao_lidas=true')
         setNotificacoes(data.data || data.notificacoes || [])
       } catch (nodeErr) {
         try {
           const userId = user?.id || user?.user_id
-          const res = await flaskClient.get(`/api/posts-simple/notificacoes/unread?user_id=${userId}`)
+          const res = await flaskClient.get(`/api/notificacoes?nao_lidas=true`)
           setNotificacoes(res.data.data || res.data.notificacoes || [])
         } catch (err2) {
           console.warn('Erro ao buscar notificações fallback final:', err2.message || err2)
@@ -116,22 +116,23 @@ export default function Feed() {
     fetchNotifications()
   }, [token, user])
 
-  useEffect(() => {
-    const socket = io(SOCKET_URL)
-    socket.on('connect', () => {
-      if (user?.id) socket.emit('autenticar', user.id)
-    })
-    socket.on('feed_atualizado', (post) => {
-      setPosts(prev => [post, ...prev])
-    })
-    socket.on('notificacao', (notif) => {
-      setNotificacoes(prev => [notif, ...prev])
-    })
-    socket.on('notificacao:all', (notif) => {
-      setNotificacoes(prev => [notif, ...prev])
-    })
-    return () => socket.disconnect()
-  }, [user?.id])
+  // TODO: Implementar socket.io no backend para real-time updates
+  // useEffect(() => {
+  //   const socket = io(SOCKET_URL)
+  //   socket.on('connect', () => {
+  //     if (user?.id) socket.emit('autenticar', user.id)
+  //   })
+  //   socket.on('feed_atualizado', (post) => {
+  //     setPosts(prev => [post, ...prev])
+  //   })
+  //   socket.on('notificacao', (notif) => {
+  //     setNotificacoes(prev => [notif, ...prev])
+  //   })
+  //   socket.on('notificacao:all', (notif) => {
+  //     setNotificacoes(prev => [notif, ...prev])
+  //   })
+  //   return () => socket.disconnect()
+  // }, [user?.id])
 
   const markNotificationRead = async (notifId) => {
     try {
