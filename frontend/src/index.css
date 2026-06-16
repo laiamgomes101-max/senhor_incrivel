@@ -240,6 +240,18 @@ h1, h2, h3, h4, h5, h6 {
   --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
+/* Mobile helpers: full-width controls and touch-friendly sizes */
+@media (max-width: 768px) {
+  .btn-primary {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .input-control {
+    min-height: 48px;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;

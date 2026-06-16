@@ -201,6 +201,7 @@
 
 form input {
   width: 100%;
+  min-height: 48px; /* toque amigável */
 }
 
 /* Password input wrapper to position show/hide button */
@@ -233,6 +234,7 @@ form input {
   background: var(--accent);
   color: white;
   font-weight: 600;
+  min-height: 48px; /* altura mínima para toque confortável */
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -394,6 +396,7 @@ form input {
   .btn-primary {
     padding: 0.75rem 1.25rem;
     font-size: 0.9rem;
+    width: 100%;
   }
   
   .password-validator {
