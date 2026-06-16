@@ -32,7 +32,10 @@ jwt.init_app(app)
 cors_origins = [origin.strip() for origin in 
     os.getenv('ALLOWED_ORIGINS', '').split(',') if origin.strip()]
 if not cors_origins:
-    cors_origins = ['http://localhost:5173']  
+    cors_origins = [
+        'http://localhost:5173',
+        'https://senhor-incrivel.vercel.app'
+    ]
 
 CORS(app, 
     resources={r"/api/*": {
