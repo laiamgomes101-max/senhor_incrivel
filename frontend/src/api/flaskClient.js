@@ -10,7 +10,7 @@ const baseURL = normalizedBaseUrl.replace(/\/api\/?$/, '');
 
 const flaskClient = axios.create({
   baseURL,
-  timeout: 8000
+  timeout: 20000
 });
 
 
