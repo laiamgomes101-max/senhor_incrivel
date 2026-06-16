@@ -29,6 +29,7 @@ class Curriculo(db.Model):
     educacao = db.Column(db.JSON)  
     habilidades = db.Column(db.JSON)  
     idiomas = db.Column(db.JSON)  
+    certificados = db.Column(db.JSON)  # Novo campo para certificados
     arquivo_url = db.Column(db.String(255))  
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
