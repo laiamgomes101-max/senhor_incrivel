@@ -39,19 +39,7 @@ export default function Candidato() {
       habilidades: [],
       idiomas: [],
       experiencia: [],
-      educacao: [],
-      certificados: []
-    }
-  })
-
-  const flaskApiUrl = import.meta.env.VITE_FLASK_URL || import.meta.env.VITE_API_URL || ''
-  const souEu = !id && meuCandidato
-  const endpoint = souEu ? '/candidatos/me' : `/candidatos/${id}`
-  const listarCandidatos = !id && empresa
-  // Currículo agora é manual: não usar upload/preview de arquivo automático
-  const arquivoUrl = null
-  const arquivoLink = null
-  const hasCurriculoData = candidato?.curriculo && (
+      educacao: []
     (candidato.curriculo.habilidades?.length > 0) ||
     (candidato.curriculo.idiomas?.length > 0) ||
     (candidato.curriculo.experiencia?.length > 0) ||
