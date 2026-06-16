@@ -35,6 +35,10 @@ class Config:
 
     database_url = os.getenv('DATABASE_URL') or os.getenv('SQLALCHEMY_DATABASE_URI')
     if database_url:
+        database_url = database_url.strip()
+        lower_url = database_url.lower()
+        if lower_url.startswith('mysql://') and 'pymysql' not in lower_url:
+            database_url = 'mysql+pymysql://' + database_url[len('mysql://'):]
         SQLALCHEMY_DATABASE_URI = database_url
     elif flask_env == 'development' and db_type == 'sqlite':
 
