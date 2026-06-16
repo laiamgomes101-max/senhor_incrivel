@@ -37,13 +37,12 @@ if not cors_origins:
         'https://senhor-incrivel.vercel.app'
     ]
 
-CORS(app, 
-    resources={r"/api/*": {
-        "origins": cors_origins,
-        "allow_headers": ["Content-Type", "Authorization"],
-        "max_age": 3600,
-        "supports_credentials": True
-    }}
+# Configure CORS using `ALLOWED_ORIGINS` (comma-separated) or defaults.
+# In production, set the Render env var `ALLOWED_ORIGINS` to the frontend origin(s)
+# e.g. `https://apwemi.vercel.app,https://senhor-incrivel.vercel.app`
+CORS(app,
+    resources={r"/api/*": {"origins": cors_origins}},
+    supports_credentials=False
 )
 
 from models import User, Candidato, Empresa
