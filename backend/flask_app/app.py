@@ -32,8 +32,8 @@ dictConfig({
     },
     'root': {
         'level': 'INFO',
-        'handlers': ['console', 'file'] if os.getenv('FLASK_ENV') == 'development' else ['file'],
-    },
+        'handlers': ['console'] if os.getenv('FLASK_ENV') != 'development' else ['console', 'file'],
+    }
 })
 
 logger = logging.getLogger(__name__)
