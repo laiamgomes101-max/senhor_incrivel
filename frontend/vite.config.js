@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  base: './', // <--- ISSO CORRIGE A TELA BRANCA NA VERCEL 🎉
   server: {
     allowedHosts: 'all',
     host: true,
