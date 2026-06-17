@@ -55,7 +55,7 @@ export default function ChatIA() {
   const [screenResults, setScreenResults] = useState([])
 
   const messagesEndRef = useRef(null)
-
+  const fileInputRef = useRef(null)
 
 
   useEffect(() => {
@@ -339,12 +339,15 @@ export default function ChatIA() {
 
 
   const handleFileChange = (e) => {
-
     setFiles(Array.from(e.target.files))
-
   }
 
-
+  const clearSelectedFiles = () => {
+    setFiles([])
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
+  }
 
   const uploadFiles = async () => {
 
@@ -688,6 +691,8 @@ export default function ChatIA() {
 
             <input
 
+              ref={fileInputRef}
+
               type="file"
 
               id="file-upload"
@@ -730,17 +735,18 @@ export default function ChatIA() {
 
             <div className="file-preview">
 
-              <span>{files.length} arquivo(s) selecionado(s)</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{files.length} arquivo(s) selecionado(s)</span>
+                <button type="button" onClick={clearSelectedFiles} className="btn-link" disabled={waiting} style={{ fontSize: '0.85rem' }}>
+                  Remover
+                </button>
+              </div>
 
               {files.length <= 10 && (
                 <div className="file-names" style={{ marginTop: '0.5rem', color: '#555' }}>
                   {files.map((file) => file.name).join(', ')}
                 </div>
               )}
-
-              <div className="file-note" style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#666' }}>
-                Você pode enviar até 250 arquivos PDF ou DOCX de uma só vez.
-              </div>
 
               <button onClick={uploadFiles} disabled={waiting} className="upload-btn">
 

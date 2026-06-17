@@ -71,15 +71,16 @@ def _serializar_comentario_completo(comentario, user_id=None):
     
     # Respostas
     respostas = []
-    for resposta in comentario.respostas:
-        respostas.append(_serializar_comentario_completo(resposta, user_id))
+    if comentario.respostas:
+        for resposta in comentario.respostas:
+            respostas.append(_serializar_comentario_completo(resposta, user_id))
     
     return {
         'id': comentario.id,
         'conteudo': comentario.conteudo,
         'autor': autor_data,
         'created_at': comentario.created_at.isoformat() if comentario.created_at else None,
-        'curtidas': comentario.curtidas_comentario.count(),
+        'curtidas': comentario.curtidas_comentario.count() if comentario.curtidas_comentario else 0,
         'respostas': respostas,
         'usuario_curtiu': user_curtiu
     }

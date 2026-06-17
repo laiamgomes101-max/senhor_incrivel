@@ -14,7 +14,7 @@ import './Candidato.css'
 
 export default function Candidato() {
   const { id } = useParams()
-  const { candidato: meuCandidato, empresa } = useAuth()
+  const { candidato: meuCandidato, empresa, loading: authLoading } = useAuth()
   const navigate = useNavigate()
   const [candidato, setCandidato] = useState(null)
   const [listaCandidatos, setListaCandidatos] = useState([])
@@ -28,6 +28,10 @@ export default function Candidato() {
   const [saving, setSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [saveError, setSaveError] = useState('')
+  // Variáveis usadas pelo componente que podem vir de rota/ctx
+  const isOwner = !!meuCandidato && (!id || String(meuCandidato.id) === String(id))
+  const listarCandidatos = !!empresa && !id
+  const endpoint = isOwner ? '/candidatos/me' : id ? `/candidatos/${id}` : null
   const initialForm = {
     nome: '',
     headline: '',
@@ -46,9 +50,22 @@ export default function Candidato() {
   const [form, setForm] = useState(initialForm);
 
   useEffect(() => {
-    if (souEu || id) {
+    setLoading(authLoading)
+  }, [authLoading])
+
+  useEffect(() => {
+    if (authLoading) return
+
+    if (isOwner || id) {
+      if (!endpoint) {
+        setErrorMsg('Rota de perfil inválida.')
+        setLoading(false)
+        return
+      }
+
+      setLoading(true)
       const promises = [flaskClient.get(`/api${endpoint}`)]
-      if (souEu) promises.push(flaskClient.get('/api/vagas/'))
+      if (isOwner) promises.push(flaskClient.get('/api/vagas/'))
       Promise.all(promises)
         .then(([perfilRes, vagasRes]) => {
           const data = perfilRes.data
@@ -71,11 +88,10 @@ export default function Candidato() {
           if (vagasRes) setVagas(vagasRes.data.vagas || [])
         })
         .catch((err) => {
-          const status = err?.response?.status
+          const status = err?.status || err?.response?.status
           if (status === 404) {
             setErrorMsg('Candidato não encontrado.')
-          } else if (status === 401) {
-            // não autorizado: levar para tela de login
+          } else if (status === 401 || status === 403) {
             navigate('/login')
             return
           } else {
@@ -85,12 +101,18 @@ export default function Candidato() {
         })
         .finally(() => setLoading(false))
     } else if (listarCandidatos) {
-      flaskClient.get('/api/candidatos/').then(({ data }) => setListaCandidatos(data.candidatos || []))
+      setLoading(true)
+      flaskClient.get('/api/candidatos/')
+        .then(({ data }) => setListaCandidatos(data.candidatos || []))
+        .catch((err) => {
+          console.error('Erro ao listar candidatos:', err)
+          setErrorMsg('Erro ao carregar a lista de candidatos.')
+        })
         .finally(() => setLoading(false))
     } else {
       setLoading(false)
     }
-  }, [id, souEu, endpoint, listarCandidatos, navigate])
+  }, [id, isOwner, endpoint, listarCandidatos, navigate, authLoading])
 
   const salvarPerfil = async (e) => {
     e.preventDefault()
@@ -271,7 +293,7 @@ export default function Candidato() {
             )}
           </div>
           <div>
-            {souEu && (
+            {isOwner && (
               <div className="profile-header">
                 <div className="profile-info">
                   <h1>Meu Perfil</h1>
@@ -286,7 +308,7 @@ export default function Candidato() {
               </div>
             )}
 
-            {souEu && (
+            {isOwner && (
               <div className="progress-section">
                 <ProgressIndicator 
                   userType="candidato" 
@@ -296,7 +318,7 @@ export default function Candidato() {
               </div>
             )}
 
-            {souEu && (
+            {isOwner && (
               <section className="profile-card profile-settings">
                 <h3>Configurações</h3>
                 <p>Gerencie informações de login e notificações em sua conta.</p>
@@ -533,7 +555,7 @@ export default function Candidato() {
                     ))}
                   </div>
                 )}
-                {souEu && (
+                {isOwner && (
                   <p className="text-muted">Para atualizar estas informações, clique em <strong>Editar Perfil</strong>.</p>
                 )}
               </section>

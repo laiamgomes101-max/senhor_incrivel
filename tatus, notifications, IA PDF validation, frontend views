@@ -1,0 +1,5 @@
+[33mf43cb28[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m chore: increase axios timeout to 20000ms to avoid frontend timeouts
+[33mb5906e7[m Fix: remove stray syntax in Candidato.jsx; extract initialForm and fix build
+[33m1df8f9b[m Fix: remove remaining certificados references from Candidato.jsx
+[33mae70f3a[m Cleanup: remove certificados field to be compatible with current DB schema (free tier limitations)
+[33m21aab2f[m Robust: avoid selecting missing certificados column; fallback to manual select and inspect columns

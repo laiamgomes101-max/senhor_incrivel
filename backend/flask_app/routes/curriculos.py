@@ -14,7 +14,7 @@ from sqlalchemy.orm import joinedload
 
 from extensions import db
 
-from models import Curriculo, Candidato, Vaga, Candidatura
+from models import Curriculo, Candidato, Vaga, Candidatura, Empresa
 
 from utils.ia_curriculum_analyzer import analyzer, ChatIA
 
@@ -37,6 +37,28 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+def resolve_vaga_by_id_or_ordinal(vaga_id, user_id):
+    vaga = db.session.get(Vaga, vaga_id)
+    if vaga:
+        return vaga
+
+    if not user_id or vaga_id < 1:
+        return None
+
+    empresa = db.session.execute(
+        db.select(Empresa).where(Empresa.user_id == user_id)
+    ).scalar_one_or_none()
+    if not empresa:
+        return None
+
+    return db.session.execute(
+        db.select(Vaga)
+            .where(Vaga.empresa_id == empresa.id, Vaga.ativa == True)
+            .order_by(Vaga.created_at.asc(), Vaga.id.asc())
+            .offset(vaga_id - 1)
+            .limit(1)
+    ).scalar_one_or_none()
 
 
 
@@ -242,27 +264,23 @@ def get_curriculo(curriculo_id):
         'idiomas': curriculo.idiomas,
 
         'arquivo_url': curriculo.arquivo_url
-
     })
 
 
 @curriculos_bp.route('/<int:curriculo_id>', methods=['DELETE'])
 @jwt_required()
 def delete_curriculo(curriculo_id):
-    user_id = get_jwt_identity()
     curriculo = db.session.get(Curriculo, curriculo_id)
     if not curriculo:
         return jsonify({'error': 'Currículo não encontrado'}), 404
 
-    candidato = db.session.get(Candidato, curriculo.candidato_id)
-    if not candidato or candidato.user_id != user_id:
-        return jsonify({'error': 'Acesso negado'}), 403
-
     uploads_dir = os.path.join(current_app.root_path, 'uploads')
-    if curriculo.arquivo_url:
-        filepath = os.path.join(uploads_dir, curriculo.arquivo_url)
-        if os.path.exists(filepath):
+    filepath = os.path.join(uploads_dir, curriculo.arquivo_url) if curriculo.arquivo_url else None
+    try:
+        if filepath and os.path.exists(filepath):
             os.remove(filepath)
+    except Exception:
+        pass
 
     db.session.delete(curriculo)
     db.session.commit()
@@ -441,6 +459,10 @@ def ia_upload():
     errors = []
 
     for f in files:
+        # Assistente só aceita PDFs conforme especificado
+        if not f.filename.lower().endswith('.pdf'):
+            errors.append({'filename': f.filename, 'error': 'Formato inválido. A assistente aceita apenas arquivos PDF.'})
+            continue
         result = _extract_text(f)
         if result.get('error'):
             errors.append({'filename': result.get('filename'), 'error': result.get('error')})
@@ -490,6 +512,103 @@ def ia_analyze():
         results.append({'index': idx, **analysis})
 
     return jsonify({'results': results})
+
+
+@curriculos_bp.route('/ia/analyze-profile', methods=['POST'])
+
+@jwt_required()
+
+def ia_analyze_profile():
+    data = request.get_json() or {}
+    profile = data.get('profile') or {}
+
+    curriculo_text = ''
+    if isinstance(profile, dict):
+        parts = []
+        habilidades = profile.get('curriculo', {}).get('habilidades') or []
+        idiomas = profile.get('curriculo', {}).get('idiomas') or []
+        experiencia = profile.get('curriculo', {}).get('experiencia') or []
+        educacao = profile.get('curriculo', {}).get('educacao') or []
+
+        if habilidades:
+            parts.append('Habilidades: ' + ', '.join(str(h) for h in habilidades))
+        if idiomas:
+            parts.append('Idiomas: ' + ', '.join(str(i) for i in idiomas))
+        if experiencia:
+            for item in experiencia:
+                if isinstance(item, dict):
+                    parts.append('Experiência: ' + ', '.join(str(v) for v in item.values() if v))
+                else:
+                    parts.append('Experiência: ' + str(item))
+        if educacao:
+            parts.append('Educação: ' + ', '.join(str(e) for e in educacao))
+        if profile.get('headline'):
+            parts.append('Headline: ' + profile.get('headline'))
+        if profile.get('sobre'):
+            parts.append('Sobre: ' + profile.get('sobre'))
+
+        curriculo_text = '\n'.join(parts).strip()
+
+    analysis = analyzer.analyze_curriculum_v2(curriculo_text, [])
+    suggestions = [
+        'Melhore a descrição das experiências com resultados mensuráveis.',
+        'Inclua palavras-chave da vaga no seu currículo para aumentar a compatibilidade.',
+        'Atualize sua formação e idiomas para destacar competências relevantes.'
+    ]
+
+    return jsonify({
+        'analysis': analysis,
+        'suggestions': suggestions
+    })
+
+
+@curriculos_bp.route('/<int:curriculo_id>/status', methods=['PUT'])
+@jwt_required()
+def update_curriculo_status(curriculo_id):
+    """Endpoint para empresas/administradores atualizarem o resultado do currículo."""
+    claims = get_jwt()
+    tipo = claims.get('tipo')
+    if tipo not in ('empresa', 'admin'):
+        return jsonify({'error': 'Permissão negada'}), 403
+
+    data = request.get_json() or {}
+    status = (data.get('status') or '').lower()
+    motivo = data.get('motivo')
+
+    if status not in ('pendente', 'aprovado', 'reprovado'):
+        return jsonify({'error': 'Status inválido'}), 400
+
+    curriculo = db.session.get(Curriculo, curriculo_id)
+    if not curriculo:
+        return jsonify({'error': 'Currículo não encontrado'}), 404
+
+    curriculo.status_resultado = status
+    curriculo.status_motivo = motivo
+    db.session.commit()
+
+    # Criar notificação para o candidato
+    try:
+        titulo = 'Resultado do currículo'
+        if status == 'aprovado':
+            mensagem = 'Seu currículo foi aprovado. Parabéns!'
+        elif status == 'reprovado':
+            mensagem = 'Seu currículo foi reprovado.'
+            if motivo:
+                mensagem += f' Motivo: {motivo}'
+        else:
+            mensagem = 'Resultado do currículo atualizado para Pendente.'
+
+        from models import Notificacao
+        notif_user_id = getattr(curriculo.candidato, 'user_id', None)
+        if notif_user_id:
+            notif = Notificacao(user_id=notif_user_id, tipo='curriculo', titulo=titulo, mensagem=mensagem)
+            db.session.add(notif)
+        db.session.add(notif)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+
+    return jsonify({'message': 'Status do currículo atualizado'})
 
 
 

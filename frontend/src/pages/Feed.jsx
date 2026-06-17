@@ -203,7 +203,8 @@ export default function Feed() {
       } else {
         await flaskClient.post('/api/vagas/candidaturas', { vaga_id: vagaId })
       }
-      setVagasAplicadas(prev => ({ ...prev, [vagaId]: true }))
+      // marcar como aplicado; se foi enviado um arquivo, marcar como 'anexado'
+      setVagasAplicadas(prev => ({ ...prev, [vagaId]: file ? 'anexado' : true }))
       alert('Candidatura enviada com sucesso!')
     } catch (err) {
       console.error('Erro ao candidatar para vaga:', err.response?.data || err.message || err)
@@ -435,22 +436,26 @@ export default function Feed() {
                         </div>
                         <div className="vaga-footer">
                           <div className="vaga-modalidade">{vaga.modalidade || 'Remoto / Presencial'}</div>
-                          {Boolean(vagasAplicadas[vaga.id] || vaga.aplicada || vaga.candidatura || vaga.candidaturas?.length) ? (
-                            <button className="btn-primary disabled" disabled>Enviado</button>
-                          ) : (
-                            <button
-                              type="button"
-                              className="btn-primary"
-                              disabled={!token || user?.tipo !== 'candidato' || uploadingApplyFile}
-                              onClick={() => handleApplyClick(vaga.id)}
-                            >
-                              {(!token || user?.tipo !== 'candidato')
-                                ? 'Entrar para candidatar'
-                                : hasPerfilCurriculo
-                                  ? 'Enviar CV'
-                                  : 'Anexar CV'}
-                            </button>
-                          )}
+                          {
+                            (vagasAplicadas[vaga.id] === 'anexado') ? (
+                              <button className="btn-primary disabled" disabled>Anexado</button>
+                            ) : Boolean(vagasAplicadas[vaga.id] || vaga.aplicada || vaga.candidatura || vaga.candidaturas?.length) ? (
+                              <button className="btn-primary disabled" disabled>Enviado</button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn-primary"
+                                disabled={!token || user?.tipo !== 'candidato' || uploadingApplyFile}
+                                onClick={() => handleApplyClick(vaga.id)}
+                              >
+                                {(!token || user?.tipo !== 'candidato')
+                                  ? 'Entrar para candidatar'
+                                  : hasPerfilCurriculo
+                                    ? 'Enviar CV'
+                                    : 'Anexar CV'}
+                              </button>
+                            )
+                          }
                         </div>
                       </article>
                     ))}

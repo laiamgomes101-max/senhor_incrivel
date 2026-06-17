@@ -25,9 +25,9 @@ export default function Empresa() {
   const [candidaturas, setCandidaturas] = useState([])
   const [candidaturasLoading, setCandidaturasLoading] = useState(false)
 
-  const souEu = !id && minhaEmpresa
+  const isOwner = !id && minhaEmpresa
   const [activeTab, setActiveTab] = useState('visao')
-  const endpoint = souEu ? '/empresas/me' : `/empresas/${id}`
+  const endpoint = isOwner ? '/empresas/me' : `/empresas/${id}`
 
   const displaySite = (url) => url?.replace(/^https?:\/\//, '').replace(/\/$/, '')
   const totalVagas = empresa?.vagas?.length || 0
@@ -41,7 +41,7 @@ export default function Empresa() {
   })
 
   useEffect(() => {
-    if (souEu || id) {
+    if (isOwner || id) {
       flaskClient.get(`/api${endpoint}`)
         .then(({ data }) => {
           setEmpresa(data)
@@ -60,11 +60,11 @@ export default function Empresa() {
       flaskClient.get('/api/empresas/').then(({ data }) => setEmpresas(data.empresas || []))
       setLoading(false)
     }
-  }, [id, souEu, endpoint, navigate])
+  }, [id, isOwner, endpoint, navigate])
 
   useEffect(() => {
     const fetchCandidaturas = async () => {
-      if (!souEu || !empresa?.id) return
+      if (!isOwner || !empresa?.id) return
       setCandidaturasLoading(true)
 
       try {
@@ -79,7 +79,7 @@ export default function Empresa() {
     }
 
     fetchCandidaturas()
-  }, [empresa?.id, souEu])
+  }, [empresa?.id, isOwner])
 
   const salvarEmpresa = async (e) => {
     e.preventDefault()
@@ -159,7 +159,7 @@ export default function Empresa() {
 
   if (loading) return <p className="loading">Carregando...</p>
 
-  if (!souEu && !id) {
+  if (!isOwner && !id) {
     return (
       <div className="empresa-page">
         <header className="empresa-hero">
@@ -216,7 +216,7 @@ export default function Empresa() {
                 <h1>{empresa?.nome}</h1>
                 <p className="setor">{empresa?.setor}</p>
               </div>
-              {souEu && (
+              {isOwner && (
                 <button onClick={() => setEditando(!editando)} className="btn-edit">
                   {editando ? 'Cancelar edição' : 'Editar perfil'}
                 </button>
@@ -246,8 +246,8 @@ export default function Empresa() {
           </div>
           <div className="stat-card">
             <span className="stat-label">Candidaturas</span>
-            <strong>{souEu ? candidaturas.length : '—'}</strong>
-            <p>{souEu ? 'Recebidas no perfil' : 'Apenas para proprietários'}</p>
+            <strong>{isOwner ? candidaturas.length : '—'}</strong>
+            <p>{isOwner ? 'Recebidas no perfil' : 'Apenas para proprietários'}</p>
           </div>
           <div className="stat-card">
             <span className="stat-label">Perfil</span>
@@ -343,7 +343,7 @@ export default function Empresa() {
           </div>
 
           <div className={`tab-panel ${activeTab === 'vagas' ? 'active' : ''}`}>
-            {souEu && (
+            {isOwner && (
               <section className="section-card">
                 <div className="section-header">
                   <h3>Publicar nova vaga</h3>
@@ -421,7 +421,7 @@ export default function Empresa() {
                               <p>{v.descricao?.slice(0, 160)}{v.descricao?.length > 160 ? '...' : ''}</p>
                               <p className="vacancy-meta">{v.tipo_contrato || 'Tipo não informado'}</p>
                             </div>
-                            {souEu && (
+                            {isOwner && (
                               <div className="vaga-actions">
                                 <button type="button" onClick={() => startEditVaga(v)}>Editar</button>
                                 <button type="button" onClick={() => deleteVaga(v.id)}>Excluir</button>
@@ -445,7 +445,7 @@ export default function Empresa() {
                 <h3>Candidatos</h3>
                 <span className="subtle">Acompanhe as candidaturas recebidas pela empresa.</span>
               </div>
-              {souEu ? (
+              {isOwner ? (
                 candidaturasLoading ? (
                   <p className="text-muted">Carregando candidaturas...</p>
                 ) : candidaturas.length > 0 ? (
@@ -475,7 +475,7 @@ export default function Empresa() {
               <div className="section-header">
                 <h3>Configurações</h3>
               </div>
-              {souEu ? (
+              {isOwner ? (
                 <>
                   <p>Edite dados da empresa, e-mail e senha na tela de configurações.</p>
                   <Link to="/app/settings" className="link-button">Ir para configurações</Link>

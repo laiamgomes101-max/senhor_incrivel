@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/client'
 import flaskClient from '../api/flaskClient'
+import PostCard from '../components/PostCard'
 // import { io } from 'socket.io-client' // TODO: Implementar socket.io no backend
 import ChatIA from './ChatIA'
 import './Feed.css'
@@ -12,7 +13,7 @@ import './Feed.css'
 const SOCKET_URL = import.meta.env.VITE_NODE_API_URL || window.location.origin
 
 export default function FeedEmpresa() {
-  const { user, empresa, token } = useAuth()
+  const { user, candidato, empresa, token } = useAuth()
   const navigate = useNavigate()
   const [posts, setPosts] = useState([])
   const [postsLoading, setPostsLoading] = useState(true)
@@ -115,6 +116,10 @@ export default function FeedEmpresa() {
     }
   }
 
+  const handlePostUpdate = (updatedPost) => {
+    setPosts((prev) => prev.map((post) => post.id === updatedPost.id ? updatedPost : post))
+  }
+
   return (
     <div className="feed-page feed-empresa-page">
       <div className="feed-header">
@@ -193,23 +198,12 @@ export default function FeedEmpresa() {
                         <p className="empty">Nenhuma publicação de candidatos encontrada no momento.</p>
                       ) : (
                         candidatePosts.map((post) => (
-                          <article key={post.id} className="post-card">
-                            <div className="post-header">
-                              <div className="post-avatar">
-                                {post.autor?.foto ? (
-                                  <img src={post.autor.foto} alt={post.autor.nome || 'Avatar'} />
-                                ) : post.autor?.nome?.[0] || 'C'}
-                              </div>
-                              <div>
-                                <strong>{post.autor?.nome || 'Candidato'}</strong>
-                                <span className="post-tipo">{post.autor?.tipo || 'candidato'}</span>
-                              </div>
-                            </div>
-                            <p className="post-conteudo">{post.conteudo}</p>
-                            <span className="post-data">
-                              {post.created_at ? new Date(post.created_at).toLocaleString('pt-BR') : ''}
-                            </span>
-                          </article>
+                          <PostCard
+                            key={post.id}
+                            post={post}
+                            user={user}
+                            candidato={candidato}
+                          />
                         ))
                       )}
                     </div>

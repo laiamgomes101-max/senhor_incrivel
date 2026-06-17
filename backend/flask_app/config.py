@@ -92,4 +92,7 @@ class Config:
         'max_overflow': 10,
     }
     JWT_ACCESS_TOKEN_EXPIRES = 86400
+    JWT_TOKEN_LOCATION = ['headers']
+    JWT_HEADER_NAME = 'Authorization'
+    JWT_HEADER_TYPE = 'Bearer'
     MAX_CONTENT_LENGTH = 1024 * 1024 * 1024  # 1GB máximo por requisição de upload

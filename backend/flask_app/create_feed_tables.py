@@ -3,8 +3,11 @@ Script para criar as tabelas de curtidas e comentários no banco de dados
 Executar: python create_feed_tables.py
 """
 
+import os
 import sys
-sys.path.insert(0, '/dev/plataforma-curriculos/backend/flask_app')
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, base_dir)
 
 from app import app, db
 from models import Post, Curtida, Comentario, CurtidaComentario

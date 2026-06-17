@@ -147,9 +147,15 @@ def login():
 
         if user.tipo == 'candidato':
 
-            if user.candidato:
-
-                claims['candidato_id'] = user.candidato.id
+            # Se candidato não existe, criar automaticamente
+            if not user.candidato:
+                from models import Candidato
+                candidato = Candidato(user_id=user.id, nome=user.email.split('@')[0] if user.email else 'Candidato')
+                db.session.add(candidato)
+                db.session.commit()
+                logger.info(f"Candidato criado automaticamente no login para user {user.id}")
+            
+            claims['candidato_id'] = user.candidato.id
 
         else:
 
@@ -211,7 +217,15 @@ def me():
 
     if user.tipo == 'candidato':
 
-        c = user.candidato
+        # Se candidato não existe, criar automaticamente
+        if not user.candidato:
+            from models import Candidato
+            c = Candidato(user_id=user.id, nome=user.email.split('@')[0] if user.email else 'Candidato')
+            db.session.add(c)
+            db.session.commit()
+            logger.info(f"Candidato criado automaticamente em /auth/me para user {user.id}")
+        else:
+            c = user.candidato
 
         response['candidato'] = {'id': c.id, 'nome': c.nome, 'headline': c.headline}
 

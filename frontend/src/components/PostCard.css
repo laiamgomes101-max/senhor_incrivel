@@ -271,6 +271,61 @@
   color: #ff6b6b;
 }
 
+.comment-actions {
+  margin-top: 8px;
+}
+
+.reply-button {
+  background: transparent;
+  border: none;
+  color: #0066cc;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 0;
+}
+
+.reply-button:hover {
+  text-decoration: underline;
+}
+
+.comment-reply-form {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.comment-reply-form textarea {
+  width: 100%;
+  min-height: 56px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.comment-replies {
+  margin-top: 12px;
+  padding-left: 16px;
+  border-left: 2px solid #f0f0f0;
+}
+
+.nested-comment {
+  margin-top: 12px;
+  background: #ffffff;
+}
+
+.no-comments {
+  margin: 0;
+  padding: 8px;
+  color: #666;
+  font-size: 13px;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .post-card {

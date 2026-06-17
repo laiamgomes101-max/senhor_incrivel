@@ -18,19 +18,22 @@ export function AuthProvider({ children }) {
         .then(({ data }) => {
           const payload = data?.data || data
           const user = payload.user || payload
+          const candidateData = payload.candidato || payload.user?.candidato || null
+          const companyData = payload.empresa || payload.user?.empresa || null
+
           setUser(user)
           if (user?.tipo === 'candidato') {
             setCandidato({
-              id: user.id,
-              nome: user.nome,
+              id: candidateData?.id || user.id,
+              nome: candidateData?.nome || user.nome || user.email?.split('@')[0] || '',
               email: user.email,
               foto_url: user.foto_url || user.foto || null
             })
             setEmpresa(null)
           } else if (user?.tipo === 'empresa') {
             setEmpresa({
-              id: user.id,
-              nome: user.nome,
+              id: companyData?.id || user.id,
+              nome: companyData?.nome || user.nome || user.email?.split('@')[0] || '',
               email: user.email,
               logo_url: user.logo_url || user.logo || null
             })
@@ -59,6 +62,8 @@ export function AuthProvider({ children }) {
     const payload = data?.data || data
     const token = payload?.token
     const user = payload?.user || payload
+    const candidateData = payload?.candidato || payload?.user?.candidato || null
+    const companyData = payload?.empresa || payload?.user?.empresa || null
 
     if (token) {
       localStorage.setItem('token', token)
@@ -67,16 +72,16 @@ export function AuthProvider({ children }) {
     setUser(user || null)
     if (user?.tipo === 'candidato') {
       setCandidato({
-        id: user.id,
-        nome: user.nome,
+        id: candidateData?.id || user.id,
+        nome: candidateData?.nome || user.nome || user.email?.split('@')[0] || '',
         email: user.email,
         foto_url: user.foto_url || user.foto || null
       })
       setEmpresa(null)
     } else if (user?.tipo === 'empresa') {
       setEmpresa({
-        id: user.id,
-        nome: user.nome,
+        id: companyData?.id || user.id,
+        nome: companyData?.nome || user.nome || user.email?.split('@')[0] || '',
         email: user.email,
         logo_url: user.logo_url || user.logo || null
       })

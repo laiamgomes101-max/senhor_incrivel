@@ -302,14 +302,12 @@ def create_candidatura():
                     ranking = idx
                     break
 
-        # criar notificação para o candidato informando resultado da análise automática
+        # criar notificação para o candidato informando que a candidatura foi recebida
+        # NÃO enviar o score automático ao candidato antes da análise manual da empresa
         try:
             user_id = candidato.user_id
-            titulo = 'Sua candidatura está em análise'
-            if ranking:
-                mensagem = f'Sua candidatura para "{vaga.titulo}" recebeu score {score} e posição provisória {ranking}.'
-            else:
-                mensagem = f'Sua candidatura para "{vaga.titulo}" recebeu score {score}. Aguarde a análise final da empresa.'
+            titulo = 'Candidatura recebida'
+            mensagem = f'Sua candidatura para "{vaga.titulo}" foi recebida e está em análise pela empresa. Você será notificado quando houver uma decisão.'
 
             notif = Notificacao(user_id=user_id, tipo='candidatura', titulo=titulo, mensagem=mensagem)
             db.session.add(notif)

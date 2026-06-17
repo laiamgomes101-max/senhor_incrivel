@@ -76,6 +76,22 @@ class CurriculumAnalyzer:
 
         'web': ['html', 'css', 'rest', 'api', 'graphql', 'websocket', 'http', 'responsive'],
 
+        'administrativa': ['excel', 'contabilidade', 'gestão', 'administração', 'rh', 'recursos humanos', 'financeiro', 'planejamento', 'orçamento', 'auditoria', 'controle de custos'],
+
+        'saude': ['enfermagem', 'hospital', 'saúde', 'médico', 'biomedicina', 'farmácia', 'fisioterapia', 'atendimento ao paciente', 'nutrição', 'cuidados'],
+
+        'construcao': ['construção', 'carpintaria', 'pedreiro', 'eletricista', 'alvenaria', 'obras', 'engenharia civil', 'segurança do trabalho', 'manutenção'],
+
+        'comercial': ['vendas', 'atendimento', 'comercial', 'negociação', 'prospecção', 'crm', 'relacionamento com cliente', 'suporte'],
+
+        'marketing': ['marketing', 'branding', 'mídias sociais', 'publicidade', 'campanhas', 'conteúdo', 'seo', 'digital', 'comunicação'],
+
+        'educacao': ['ensino', 'professor', 'docente', 'tutor', 'pedagogia', 'educação', 'treinamento'],
+
+        'logistica': ['logística', 'transporte', 'estoque', 'armazém', 'supply chain', 'expedição', 'planejamento de rotas'],
+
+        'operacional': ['operações', 'qualidade', 'processos', 'produção', 'manutenção', 'controle de qualidade'],
+
     }
 
 
@@ -691,15 +707,23 @@ class CurriculumAnalyzer:
 
         areas = {
 
-            'tecnologia': ['python', 'javascript', 'engenharia de software', 'desenvolvedor', 'java', 'sql'],
+            'tecnologia': ['python', 'javascript', 'engenharia de software', 'desenvolvedor', 'java', 'sql', 'react', 'html', 'css', 'infraestrutura'],
 
-            'saude': ['enfermagem', 'hospital', 'saude', 'mÃ©dico', 'biomedicina', 'farmacia'],
+            'saude': ['enfermagem', 'hospital', 'saúde', 'médico', 'biomedicina', 'farmácia', 'fisioterapia', 'atendimento ao paciente', 'nutrição'],
 
-            'administrativa': ['excel', 'contabilidade', 'gestÃ£o', 'administraÃ§Ã£o', 'rh', 'financeiro'],
+            'administrativa': ['excel', 'contabilidade', 'gestão', 'administração', 'rh', 'recursos humanos', 'financeiro', 'orçamento', 'auditoria'],
 
-            'construcao': ['eletricidade', 'carpintaria', 'soldagem', 'obras', 'construÃ§Ã£o'],
+            'construcao': ['construção', 'carpintaria', 'pedreiro', 'eletricista', 'alvenaria', 'obras', 'engenharia civil', 'segurança do trabalho'],
 
+            'comercial': ['vendas', 'atendimento', 'comercial', 'negociação', 'prospecção', 'crm', 'relacionamento com cliente', 'suporte'],
 
+            'marketing': ['marketing', 'branding', 'mídias sociais', 'publicidade', 'campanhas', 'conteúdo', 'seo', 'digital'],
+
+            'educacao': ['ensino', 'professor', 'docente', 'tutor', 'pedagogia', 'educação', 'treinamento'],
+
+            'logistica': ['logística', 'transporte', 'estoque', 'armazém', 'supply chain', 'expedição', 'planejamento de rotas'],
+
+            'operacional': ['operações', 'qualidade', 'processos', 'produção', 'manutenção', 'controle de qualidade'],
 
         }
 
@@ -868,6 +892,15 @@ class CurriculumAnalyzer:
 
 
 
+
+    def clean_text(self, text: str) -> str:
+        if not text:
+            return ''
+        t = text.replace('\r\n', '\n').replace('\r', '\n')
+        t = ''.join(ch for ch in t if ch.isprintable() or ch == '\n')
+        t = re.sub(r"[\t ]+", ' ', t)
+        t = re.sub(r"\n{2,}", '\n\n', t)
+        return t.strip()
 
 analyzer = CurriculumAnalyzer()
 
@@ -1145,6 +1178,13 @@ class ChatIA:
             if self.user_tipo == 'empresa':
                 return "Por favor, envie os currículos dos candidatos para que eu possa compará-los."
             return "Por favor, envie seu currículo para que eu possa compará-lo com outros ou dar sugestões."
+
+        if self.user_tipo == 'empresa' and not self.requisitos:
+            return (
+                "Para comparar os currículos carregados com a vaga, por favor informe os requisitos da vaga usando "
+                "requisitos: python, django, 3 anos experiência "
+                "ou algo semelhante."
+            )
 
         comparisons = []
         skills_sets = []

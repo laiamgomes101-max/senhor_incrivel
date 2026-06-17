@@ -30,5 +30,7 @@ class Curriculo(db.Model):
     habilidades = db.Column(db.JSON)  
     idiomas = db.Column(db.JSON)  
     arquivo_url = db.Column(db.String(255))  
+    status_resultado = db.Column(db.String(20), server_default='pendente')
+    status_motivo = db.Column(db.Text)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())

@@ -57,10 +57,16 @@ else:
 
 CORS(app,
     resources={r"/api/*": cors_args},
-    supports_credentials=False
+    supports_credentials=True,
+    allow_headers=[
+        'Content-Type',
+        'Authorization',
+        'Accept',
+        'X-Requested-With'
+    ]
 )
 
-from models import User, Candidato, Empresa
+from models import User, Candidato, Empresa, Post, Notificacao, Curtida, Comentario, CurtidaComentario
 from routes.auth import auth_bp
 from routes.curriculos import curriculos_bp
 from routes.vagas import vagas_bp
@@ -100,9 +106,16 @@ def handle_business_error(error):
 
 @app.errorhandler(Exception)
 def handle_unexpected_error(error):
+    import traceback
+    tb = traceback.format_exc()
     logger.error(f'Erro inesperado: {str(error)}', exc_info=True)
-    if os.getenv('FLASK_ENV') == 'development':
-        return jsonify({'error': str(error)}), 500
+    logger.debug(f'Stack trace:\n{tb}')
+    if os.getenv('FLASK_ENV') == 'development' or app.config.get('ENV') == 'development':
+        return jsonify({
+            'error': str(error),
+            'type': error.__class__.__name__,
+            'traceback': tb
+        }), 500
     return jsonify({'error': 'Erro interno do servidor'}), 500
 
 @app.route('/health')

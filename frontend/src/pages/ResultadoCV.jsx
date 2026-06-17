@@ -2,6 +2,7 @@
 // Propósito: Exibir o resultado da análise do currículo.
 import { useState, useEffect } from 'react'
 import api from '../api/client'
+import flaskClient from '../api/flaskClient'
 import './ResultadoCV.css'
 
 export default function ResultadoCV() {
@@ -12,33 +13,22 @@ export default function ResultadoCV() {
   useEffect(() => {
     const fetchAnalysis = async () => {
       try {
-        const res = await api.get('/analisar/historico')
-        const hist = res.data.historico || []
-        if (hist.length) {
-          const row = hist[0]
-          let parsed = null
-          if (row.resultado) {
-            try {
-              parsed = typeof row.resultado === 'string' ? JSON.parse(row.resultado) : row.resultado
-            } catch (e) {
-              console.warn('Falha ao parsear resultado da análise:', e)
-              parsed = row.resultado
-            }
-            // anexa metadados se não existirem
-            parsed.meta = parsed.meta || {
-              user_id: row.user_id,
-              curriculo_id: row.curriculo_id,
-              vaga_id: row.vaga_id,
-              data_analise: row.data_analise || null
-            }
-            setAnalysis(parsed)
-          } else {
-            setAnalysis(row)
-          }
-        } else setAnalysis(null)
+        // Buscar perfil do candidato que inclui o currículo e o status
+        const res = await flaskClient.get('/api/candidatos/me')
+        const perfil = res.data || {}
+        const curriculo = perfil.curriculo || null
+        if (!curriculo) {
+          setAnalysis(null)
+        } else {
+          setAnalysis({
+            status: curriculo.status_resultado || 'pendente',
+            motivo: curriculo.status_motivo || null,
+            arquivo_url: curriculo.arquivo_url || null
+          })
+        }
       } catch (err) {
         console.error(err)
-        setError('Não foi possível obter o resultado.')
+        setError('Não foi possível obter o resultado do currículo.')
       } finally {
         setLoading(false)
       }
@@ -59,9 +49,10 @@ export default function ResultadoCV() {
           {(analysis.skills || []).map((s, i) => <li key={i}>{s}</li>)}
         </ul>
       </section>
-      <section className="score">
-        <h3>Score geral</h3>
-        <p>{analysis.compatibilidade_pct ?? analysis.score}%</p>
+      <section className="status">
+        <h3>Status do Currículo</h3>
+        <p>{analysis.status === 'aprovado' ? 'Aprovado' : analysis.status === 'reprovado' ? 'Reprovado' : 'Pendente'}</p>
+        {analysis.motivo && <p><strong>Motivo:</strong> {analysis.motivo}</p>}
       </section>
       <section className="suggestions">
         <h3>Sugestões</h3>

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
 from extensions import db
-from models import Candidato, Curriculo
+from models import Candidato, Curriculo, User
 import logging
 import json
 
@@ -50,13 +50,31 @@ def meu_perfil():
 
     try:
         logger.info(f"Buscando candidato com ID: {candidato_id}")
-        candidato = db.get_or_404(Candidato, candidato_id)
+        candidato = db.session.get(Candidato, candidato_id)
+        
+        # Se candidato não existe, criar automaticamente a partir do User
+        if not candidato:
+            user_id = get_jwt_identity()
+            user = db.session.get(User, int(user_id) if isinstance(user_id, str) else user_id)
+            if not user:
+                logger.error(f"Usuário {user_id} não encontrado ao tentar criar candidato")
+                return jsonify({'error': 'Usuário não encontrado'}), 401
+            
+            logger.info(f"Criando candidato on-demand para user_id {user_id}")
+            candidato = Candidato(
+                user_id=user.id,
+                nome=user.email.split('@')[0] if user.email else 'Candidato'
+            )
+            db.session.add(candidato)
+            db.session.commit()
+            logger.info(f"Candidato criado com ID: {candidato.id}")
+        
         logger.info(f"Candidato encontrado: {candidato.nome}")
     except Exception as e:
-        logger.error(f"Erro ao carregar candidato {candidato_id}: {type(e).__name__}: {str(e)}")
         import traceback
+        logger.error(f"Erro ao carregar/criar candidato {candidato_id}: {type(e).__name__}: {str(e)}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        return jsonify({'error': 'Candidato não encontrado'}), 404
+        return jsonify({'error': 'Candidato não encontrado', 'details': str(e)}), 404
 
     if request.method == 'GET':
         try:
@@ -64,14 +82,41 @@ def meu_perfil():
                 'id': candidato.id, 'nome': candidato.nome, 'headline': candidato.headline,
                 'localizacao': candidato.localizacao, 'sobre': candidato.sobre, 'foto_url': candidato.foto_url
             }
-            if candidato.curriculo:
+            # Tentar usar relacionamento normal; se o banco estiver sem colunas esperadas,
+            # capturamos a exceção e fazemos um SELECT raw com colunas compatíveis.
+            try:
+                curr = candidato.curriculo
+            except Exception as e:
+                logger.warning('Falha ao carregar candidato.curriculo via ORM, usando fallback raw SQL: %s', e)
+                curr = None
+                try:
+                    # Buscar apenas colunas compatíveis para evitar erro se o esquema não estiver atualizado
+                    sql = (
+                        "SELECT id, experiencia, educacao, habilidades, idiomas, arquivo_url "
+                        "FROM curriculos WHERE candidato_id = :cid LIMIT 1"
+                    )
+                    row = db.session.execute(db.text(sql), {'cid': candidato.id}).first()
+                    if row:
+                        curr = type('R', (), {})()
+                        curr.id = row[0]
+                        curr.experiencia = row[1]
+                        curr.educacao = row[2]
+                        curr.habilidades = row[3]
+                        curr.idiomas = row[4]
+                        curr.arquivo_url = row[5]
+                except Exception as e2:
+                    logger.exception('Fallback SQL falhou: %s', e2)
+
+            if curr:
                 data['curriculo'] = {
-                    'id': candidato.curriculo.id,
-                    'experiencia': safe_json_value(candidato.curriculo.experiencia),
-                    'educacao': safe_json_value(candidato.curriculo.educacao),
-                    'habilidades': safe_json_value(candidato.curriculo.habilidades),
-                    'idiomas': safe_json_value(candidato.curriculo.idiomas),
-                    'arquivo_url': candidato.curriculo.arquivo_url
+                    'id': getattr(curr, 'id', None),
+                    'experiencia': safe_json_value(getattr(curr, 'experiencia', None)),
+                    'educacao': safe_json_value(getattr(curr, 'educacao', None)),
+                    'habilidades': safe_json_value(getattr(curr, 'habilidades', None)),
+                    'idiomas': safe_json_value(getattr(curr, 'idiomas', None)),
+                    'arquivo_url': getattr(curr, 'arquivo_url', None),
+                    'status_resultado': getattr(curr, 'status_resultado', 'pendente'),
+                    'status_motivo': getattr(curr, 'status_motivo', None)
                 }
             logger.info(f"GET /api/candidatos/me retornado com sucesso para candidato {candidato_id}")
             return jsonify(data)
@@ -145,13 +190,38 @@ def obter_candidato(id):
         'id': candidato.id, 'nome': candidato.nome, 'headline': candidato.headline,
         'localizacao': candidato.localizacao, 'sobre': candidato.sobre, 'foto_url': candidato.foto_url
     }
-    if candidato.curriculo:
+    # Tentar carregar curriculo via ORM; se falhar (esquema desatualizado), usar fallback raw SQL
+    try:
+        curr = candidato.curriculo
+    except Exception as e:
+        logger.warning('Falha ao carregar candidato.curriculo via ORM em obter_candidato, usando fallback: %s', e)
+        curr = None
+        try:
+            sql = (
+                "SELECT id, experiencia, educacao, habilidades, idiomas, arquivo_url "
+                "FROM curriculos WHERE candidato_id = :cid LIMIT 1"
+            )
+            row = db.session.execute(db.text(sql), {'cid': candidato.id}).first()
+            if row:
+                curr = type('R', (), {})()
+                curr.id = row[0]
+                curr.experiencia = row[1]
+                curr.educacao = row[2]
+                curr.habilidades = row[3]
+                curr.idiomas = row[4]
+                curr.arquivo_url = row[5]
+        except Exception as e2:
+            logger.exception('Fallback SQL falhou em obter_candidato: %s', e2)
+
+    if curr:
         data['curriculo'] = {
-            'id': candidato.curriculo.id,
-            'experiencia': candidato.curriculo.experiencia,
-            'educacao': candidato.curriculo.educacao,
-            'habilidades': candidato.curriculo.habilidades,
-            'idiomas': candidato.curriculo.idiomas,
-            'arquivo_url': candidato.curriculo.arquivo_url
+            'id': getattr(curr, 'id', None),
+            'experiencia': getattr(curr, 'experiencia', None),
+            'educacao': getattr(curr, 'educacao', None),
+            'habilidades': getattr(curr, 'habilidades', None),
+            'idiomas': getattr(curr, 'idiomas', None),
+            'arquivo_url': getattr(curr, 'arquivo_url', None),
+            'status_resultado': getattr(curr, 'status_resultado', 'pendente'),
+            'status_motivo': getattr(curr, 'status_motivo', None)
         }
     return jsonify(data)
